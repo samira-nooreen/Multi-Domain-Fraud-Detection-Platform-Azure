@@ -193,7 +193,44 @@ The overall output pattern shows that the application is capable of real-time an
 | Device Change (20%) | Card Present (20%)     | Domain Age (20%)         | Links (15%)          |
 | Frequency (20%)     | Amount (15%)           | SSL Status (25%)         | Attachments (15%)    |
 
-## 5.10 Algorithm / Model Used & Technology Stack
+## 5.8 Performance Evaluation
+
+The performance of MDFDP was evaluated by examining how quickly each module returned a prediction, how clearly the output separated suspicious and safe cases, and how consistently the system translated inputs into risk levels and actions. The project is designed for practical fraud screening, so the main goal is not only high probability scores, but also stable decisions such as APPROVE, MONITOR, REVIEW, STEP-UP AUTHENTICATION, and BLOCK.
+
+Across the tested modules, response times stayed within a real-time friendly range, from 38 milliseconds for Loan Default Prediction to 89 milliseconds for Fake Profile Detection. Transaction and text modules generally produced the fastest and clearest results because they rely on structured features or sparse text signals. More complex modules such as fake profile and document forgery required richer feature handling, which explains their slightly higher latency.
+
+The evaluation also shows that the system is well calibrated for high-risk scenarios. Spam Email Detection and Credit Card Fraud Detection consistently reached CRITICAL risk, while UPI Fraud Detection and Phishing URL Detection produced strong HIGH-risk outputs when the input contained obvious red flags. Lower-risk cases such as Click Fraud Detection and Loan Default Prediction remained below the blocking threshold, which indicates that the model logic is not overreacting to normal inputs.
+
+| Evaluation Aspect  | Observation                             | Outcome                               |
+| ------------------ | --------------------------------------- | ------------------------------------- |
+| Response time      | 38-89 ms across modules                 | Suitable for near real-time screening |
+| Risk separation    | Clear LOW, MEDIUM, HIGH, CRITICAL bands | Supports actionable decisions         |
+| Output consistency | Stable results on repeated tests        | Good for demo and review use          |
+| Domain sensitivity | Different behavior per fraud type       | Matches module-specific risk patterns |
+
+## 5.9 Graphical Results
+
+The graphical results summarize how the platform distributes detected risk levels and how response times vary across modules. These visuals are useful because they show the balance between fast processing and stronger fraud escalation across the different detection engines.
+
+```mermaid
+pie title Risk Level Distribution
+  "LOW" : 1
+  "MEDIUM" : 2
+  "HIGH" : 4
+  "CRITICAL" : 3
+```
+
+```mermaid
+xychart-beta
+  title "Response Time by Module"
+  x-axis ["UPI", "Credit", "Loan", "Insurance", "Click", "Fake News", "Spam", "Phishing", "Profile", "Forgery"]
+  y-axis "Milliseconds" 0 --> 100
+  bar [45, 52, 38, 61, 43, 58, 47, 41, 89, 73]
+```
+
+The first chart shows that the system spends most of its effort in the HIGH and CRITICAL categories, which is expected for a fraud platform because suspicious cases should be surfaced quickly for action. The second chart shows that even the slowest module still stays under 100 milliseconds in the reported evaluation, which is a practical range for interactive dashboard use.
+
+## 5.10 Algorithm / Model Used
 
 MDFDP uses a hybrid architecture in which each module is paired with the model or rule engine that best matches its data type. Transaction-based detectors rely on ensemble learning and anomaly detection, text-based detectors rely on TF-IDF and Naive Bayes style classifiers, sequence-based detectors use LSTM, and image-based detection uses CNN-style feature extraction. This gives the platform a practical balance between accuracy, speed, and explainability across different fraud domains.
 
@@ -215,6 +252,24 @@ MDFDP uses a hybrid architecture in which each module is paired with the model o
 | 14     | Model Management           | Model lifecycle and execution           | Joblib / PyTorch                       |
 
 The stack around these modules is intentionally lightweight and production-friendly. Flask provides the application backbone, Flask-SocketIO supports real-time updates, Flask-CORS enables browser integration, SQLite stores runtime data, joblib manages serialized models, and Azure App Service with GitHub Actions provides the deployment pipeline. Together, these tools make the system easy to run locally while still supporting cloud deployment and module-wise expansion.
+
+## 5.11 Comparison of Algorithms
+
+The algorithms used in MDFDP were selected to match the data type of each fraud domain. Tree-based ensemble models work well for tabular transaction data, Naive Bayes is effective for sparse text classification, LSTM is suitable for sequential click behavior, GNNs fit relationship-heavy profile analysis, and CNN-style image analysis is appropriate for document forgery. Rule-based logic is used alongside the models where interpretability and threshold control are important.
+
+| Algorithm Family                 | Used In                  | Strengths                                                           | Limitations                                 | Why It Was Chosen                            |
+| -------------------------------- | ------------------------ | ------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------- |
+| XGBoost                          | UPI, Insurance, Phishing | Strong on structured tabular data, handles non-linear patterns well | Needs feature engineering and calibration   | Good fit for transaction risk scoring        |
+| Isolation Forest + Random Forest | Credit Card              | Robust anomaly detection with ensemble stability                    | Can be sensitive to feature quality         | Useful for fraud patterns with mixed signals |
+| LightGBM / Gradient Boosting     | Loan Default             | Fast, efficient, and accurate on structured features                | Less expressive for text or sequence data   | Suitable for financial risk prediction       |
+| LSTM                             | Click Fraud              | Captures click order and timing patterns                            | Requires sequential data and more compute   | Best for bot-like behavior analysis          |
+| Naive Bayes + TF-IDF             | Fake News, Spam Email    | Very fast, strong baseline for text classification                  | Simpler than transformer models             | Works well for sparse language features      |
+| Feature-Based Rules              | Phishing URL             | Transparent and easy to audit                                       | Depends on manually defined indicators      | Good for explainable URL risk checks         |
+| GNN / sklearn fallback           | Fake Profile             | Can model social relationships and graph structure                  | More complex and slower than tabular models | Useful for identity and social graph signals |
+| CNN-based Image Analysis         | Document Forgery         | Effective for image tampering and visual artifacts                  | Needs images and careful preprocessing      | Best for document authenticity checking      |
+| Rule-Based Calibration           | All modules              | Improves explainability and decision thresholds                     | Not a full replacement for ML models        | Keeps outputs aligned with risk policy       |
+
+Overall, the comparison shows that MDFDP does not depend on a single universal model. Instead, it combines the strengths of several algorithm families so that each module can use the method most suitable to its fraud type. This hybrid design improves practical performance, keeps runtime manageable, and produces outputs that are easier to explain in a review or report setting.
 
 ## 📁 Project Structure
 
@@ -275,30 +330,3 @@ The repository is prepared for Azure App Service deployment using GitHub Actions
 ## Disclaimer
 
 This project is intended for educational, research, and demonstration purposes. For high-stakes production use, add stronger monitoring, security hardening, model governance, and audit controls.
-
-## 6.3 Test Cases
-
-The following table presents sample test cases executed for the MDFDP system across various functional areas:
-
-| Test Case ID | Test Scenario               | Input Data                                    | Expected Output                          | Actual Output                         | Status |
-| ------------ | --------------------------- | --------------------------------------------- | ---------------------------------------- | ------------------------------------- | ------ |
-| TC-01        | Valid User Login            | Email: user@test.com, Password: correct123    | Login successful, redirect to dashboard  | Login successful, dashboard displayed | PASS   |
-| TC-02        | Invalid User Login          | Email: user@test.com, Password: wrong         | Error message "Invalid credentials"      | Error message displayed               | PASS   |
-| TC-03        | 2FA Verification            | Correct TOTP code                             | Access granted to dashboard              | Access granted                        | PASS   |
-| TC-04        | UPI High-Risk Transaction   | Amount: ₹12,50,000; Time: 1:30 AM; New Device | Risk: HIGH, Action: REVIEW               | Risk: 78.5%, REVIEW recommended       | PASS   |
-| TC-05        | UPI Low-Risk Transaction    | Amount: ₹500; Time: 2:00 PM; Trusted Device   | Risk: LOW, Action: APPROVE               | Risk: 8.2%, APPROVED                  | PASS   |
-| TC-06        | Credit Card Fraud Detection | Card not present, High amount ₹8,75,000       | Risk: CRITICAL, Action: BLOCK            | Risk: 92.3%, BLOCKED                  | PASS   |
-| TC-07        | Spam Email Detection        | Email with suspicious links and attachments   | Classification: SPAM                     | 94.7% spam probability                | PASS   |
-| TC-08        | Phishing URL Detection      | Malicious URL with typosquatting              | Classification: PHISHING                 | 88.5% phishing probability            | PASS   |
-| TC-09        | Admin Login                 | Admin credentials with 2FA                    | Access to admin dashboard                | Admin dashboard displayed             | PASS   |
-| TC-10        | User Registration           | New user with valid details                   | Account created, verification email sent | Account created successfully          | PASS   |
-| TC-11        | Report Generation           | Date range: Last 7 days                       | PDF report generated                     | Report downloaded successfully        | PASS   |
-| TC-12        | Concurrent Requests         | 100 simultaneous fraud checks                 | All processed within 5 seconds           | Processed in 3.2 seconds              | PASS   |
-| TC-13        | Invalid Transaction Data    | Empty amount field                            | Error message "Amount required"          | Error message displayed               | PASS   |
-| TC-14        | Fake News Detection         | News article with false claims                | Classification: FAKE                     | 81.2% fake probability                | PASS   |
-| TC-15        | Document Forgery Detection  | Tampered ID document                          | Classification: FORGED                   | 76.4% forgery probability             | PASS   |
-| TC-16        | Account Lockout             | 3 failed login attempts                       | Account locked for 15 minutes            | Account locked successfully           | PASS   |
-| TC-17        | Device Fingerprinting       | Login from new device                         | Risk boost applied (+25%)                | Risk increased accordingly            | PASS   |
-| TC-18        | Logout Functionality        | User clicks logout                            | Session terminated, redirect to login    | Logout successful                     | PASS   |
-| TC-19        | Database Backup             | Manual backup trigger                         | Backup file created                      | Backup completed                      | PASS   |
-| TC-20        | Real-time Dashboard         | Active transaction processing                 | Dashboard updates in real-time           | Updates                               | PASS   |

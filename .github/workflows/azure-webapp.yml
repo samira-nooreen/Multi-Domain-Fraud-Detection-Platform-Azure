@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: azure-webapp-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PYTHON_VERSION: "3.11"
 
@@ -22,6 +26,42 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Build deployment bundle
+        run: |
+          DEPLOY_DIR="$GITHUB_WORKSPACE/deploy"
+          rm -rf "$DEPLOY_DIR"
+          mkdir -p "$DEPLOY_DIR"
+          rsync -a \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude '.venv/' \
+            --exclude '.python_packages/' \
+            --exclude '.vscode/' \
+            --exclude '__pycache__/' \
+            --exclude '*.pyc' \
+            --exclude '*.pyo' \
+            --exclude '*.pyd' \
+            --exclude '*.log' \
+            --exclude 'debug_output*.txt' \
+            --exclude 'dump_output*.txt' \
+            --exclude 'app_startup*.txt' \
+            --exclude 'data_backup/' \
+            --exclude 'models_backup/' \
+            --exclude 'logs/' \
+            --exclude 'tests/' \
+            --exclude 'docs/' \
+            --exclude '*.zip' \
+            --exclude '*.tar.gz' \
+            --exclude '*.7z' \
+            ./ "$DEPLOY_DIR/"
+          python -m pip install --upgrade pip
+          python -m pip install --target "$DEPLOY_DIR/.python_packages/lib/site-packages" -r requirements.txt
+
+      - name: Smoke test app import
+        env:
+          PYTHONPATH: ${{ github.workspace }}/deploy/.python_packages/lib/site-packages:${{ github.workspace }}/deploy
+        run: python -c "import app; print('APP_IMPORT_OK')"
+
       - name: Validate core app files
         run: python -m compileall app.py database.py
 
@@ -30,4 +70,4 @@ jobs:
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .
+          package: ./deploy
