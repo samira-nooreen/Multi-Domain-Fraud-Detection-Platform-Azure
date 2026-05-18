@@ -1,179 +1,248 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Verify Login - MDFDP</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/colors.css') }}"
+    />
     <style>
-        body {
-            background: var(--bg-black);
-            color: var(--text-secondary);
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
+      body {
+        background: var(--bg-black);
+        color: var(--text-secondary);
+        font-family: "Inter", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
 
-        .verify-container {
-            background: var(--bg-card);
-            padding: 2.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--border-dark);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: var(--shadow-card);
-        }
+      .verify-container {
+        background: var(--bg-card);
+        padding: 2.5rem;
+        border-radius: 16px;
+        border: 1px solid var(--border-dark);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+        box-shadow: var(--shadow-card);
+      }
 
-        .icon-circle {
-            width: 80px;
-            height: 80px;
-            background: rgba(136, 118, 248, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-        }
+      .icon-circle {
+        width: 80px;
+        height: 80px;
+        background: rgba(136, 118, 248, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+      }
 
-        .icon-circle i {
-            font-size: 2.5rem;
-            color: var(--primary-purple);
-        }
+      .icon-circle i {
+        font-size: 2.5rem;
+        color: var(--primary-purple);
+      }
 
-        h2 {
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            font-size: 1.8rem;
-        }
+      h2 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1.8rem;
+      }
 
-        p {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            line-height: 1.5;
-        }
+      p {
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+        line-height: 1.5;
+      }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
+      .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+      }
 
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-light);
-            font-weight: 500;
-        }
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-light);
+        font-weight: 500;
+      }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-dark);
-            border: 1px solid var(--border-medium);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 1.2rem;
-            text-align: center;
-            letter-spacing: 4px;
-            transition: border-color 0.3s;
-        }
+      input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        background: var(--bg-dark);
+        border: 1px solid var(--border-medium);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        text-align: center;
+        letter-spacing: 4px;
+        transition: border-color 0.3s;
+      }
 
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary-purple);
-        }
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-purple);
+      }
 
-        .trust-device {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 2rem;
-            cursor: pointer;
-        }
+      .trust-device {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 2rem;
+        cursor: pointer;
+      }
 
-        .trust-device input {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary-purple);
-        }
+      .trust-device input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-purple);
+      }
 
-        .verify-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--primary-purple);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+      .verify-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary-purple);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
 
-        .verify-btn:hover {
-            background: var(--primary-purple-dark);
-        }
+      .verify-btn:hover {
+        background: var(--primary-purple-dark);
+      }
 
-        .risk-alert {
-            background: rgba(250, 57, 95, 0.1);
-            border: 1px solid var(--status-critical);
-            color: var(--status-critical);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-align: left;
-        }
+      .risk-alert {
+        background: rgba(250, 57, 95, 0.1);
+        border: 1px solid var(--status-critical);
+        color: var(--status-critical);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+      }
 
-        .risk-alert i {
-            font-size: 1.2rem;
-        }
+      .risk-alert i {
+        font-size: 1.2rem;
+      }
+
+      .reset-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-medium);
+      }
+
+      .reset-text {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 0.9rem;
+      }
+
+      .reset-btn {
+        width: 100%;
+        padding: 12px;
+        background: transparent;
+        color: #ff6b6b;
+        border: 1px solid rgba(255, 107, 107, 0.35);
+        border-radius: 25px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .reset-btn:hover {
+        background: rgba(255, 107, 107, 0.08);
+        border-color: rgba(255, 107, 107, 0.55);
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="verify-container">
-        <div class="icon-circle">
-            <i class="fas fa-shield-alt"></i>
+      <div class="icon-circle">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+
+      <h2>Security Verification</h2>
+
+      {% if risk_level == 'High' or risk_level == 'Critical' %}
+      <div class="risk-alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+          <strong>Unusual Activity Detected</strong><br />
+          <small>We noticed a login from a new location or device.</small>
+        </div>
+      </div>
+      {% endif %}
+
+      <p>
+        Please enter the verification code from your authenticator app to
+        continue.
+      </p>
+
+      <form method="POST" action="{{ url_for('verify_2fa') }}">
+        <div class="form-group">
+          <input
+            type="text"
+            name="totp_code"
+            placeholder="000 000"
+            maxlength="6"
+            required
+            autofocus
+            autocomplete="off"
+          />
         </div>
 
-        <h2>Security Verification</h2>
+        <label class="trust-device">
+          <input type="checkbox" name="trust_device" value="true" />
+          <span>Trust this device for 30 days</span>
+        </label>
 
-        {% if risk_level == 'High' or risk_level == 'Critical' %}
-        <div class="risk-alert">
-            <i class="fas fa-exclamation-triangle"></i>
-            <div>
-                <strong>Unusual Activity Detected</strong><br>
-                <small>We noticed a login from a new location or device.</small>
-            </div>
-        </div>
-        {% endif %}
+        <button type="submit" class="verify-btn">Verify Login</button>
+      </form>
 
-        <p>Please enter the verification code from your authenticator app to continue.</p>
-
-        <form method="POST" action="{{ url_for('verify_2fa') }}">
-            <div class="form-group">
-                <input type="text" name="totp_code" placeholder="000 000" maxlength="6" required autofocus
-                    autocomplete="off">
-            </div>
-
-            <label class="trust-device">
-                <input type="checkbox" name="trust_device" value="true">
-                <span>Trust this device for 30 days</span>
-            </label>
-
-            <button type="submit" class="verify-btn">Verify Login</button>
+      <div class="reset-section">
+        <p class="reset-text">
+          If you removed this account from your authenticator app or can no
+          longer access it, you can delete your account data and start again
+          with a fresh signup.
+        </p>
+        <form
+          method="POST"
+          action="{{ reset_url }}"
+          onsubmit="
+            return confirm(
+              'This will delete your account data and send you back to signup. Continue?',
+            );
+          "
+        >
+          <button type="submit" class="reset-btn">
+            Delete my account and sign up again
+          </button>
         </form>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>

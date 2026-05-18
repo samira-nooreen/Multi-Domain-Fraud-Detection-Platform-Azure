@@ -252,7 +252,7 @@ def login():
         next_url = request.args.get('next')
         return render_template('login.html', next_url=next_url)
     
-    email = request.form.get('email')
+    email = (request.form.get('email') or '').strip().lower()
     password = request.form.get('password')
     
     # Verify user credentials using database
@@ -310,10 +310,14 @@ def signup():
         return redirect(url_for('index'))
 
     if request.method == 'GET':
-        return render_template('signup.html')
+        reset_requested = request.args.get('reset') == '1'
+        return render_template(
+            'signup.html',
+            success='Your account has been removed. Please create a new account to continue.' if reset_requested else None
+        )
     
-    name = request.form.get('name')
-    email = request.form.get('email')
+    name = (request.form.get('name') or '').strip()
+    email = (request.form.get('email') or '').strip().lower()
     password = request.form.get('password')
     confirm_password = request.form.get('confirm_password')
     
@@ -399,7 +403,11 @@ def verify_2fa():
         else:
             # Normal login verification
             risk_level = session.get('risk_level', 'Low')
-            return render_template('verify_login.html', risk_level=risk_level)
+            return render_template(
+                'verify_login.html',
+                risk_level=risk_level,
+                reset_url=url_for('reset_account')
+            )
     
     # POST - verify code
     code = request.form.get('code') or request.form.get('totp_code')
@@ -446,13 +454,48 @@ def verify_2fa():
             risk_level = session.get('risk_level', 'Low')
             return render_template('verify_login.html', 
                                  risk_level=risk_level,
-                                 error='Invalid authentication code')
+                                 error='Invalid authentication code',
+                                 reset_url=url_for('reset_account'))
 
 @app.route('/logout')
 def logout():
     """User logout"""
     session.clear()
     return redirect(url_for('login'))
+
+
+@app.route('/reset_account', methods=['POST'])
+def reset_account():
+    """Delete the current account and force a fresh signup."""
+    target_user_id = session.get('temp_user_id') or session.get('user_id')
+    if not target_user_id:
+        return redirect(url_for('login'))
+
+    try:
+        delete_user_account(target_user_id)
+    finally:
+        session.clear()
+
+    return redirect(url_for('signup', reset='1'))
+
+
+@app.route('/reset_2fa', methods=['POST'])
+@login_required
+def reset_2fa():
+    """Generate a fresh TOTP secret and show a new QR code for setup."""
+    user_id = session.get('user_id')
+    user = get_user_by_id(user_id)
+    if not user:
+        return redirect(url_for('login'))
+
+    totp_secret = pyotp.random_base32()
+    update_totp_secret(user_id, totp_secret)
+
+    session['temp_user_id'] = user_id
+    session['temp_user_name'] = user['name']
+    session['setup_2fa'] = True
+
+    return redirect(url_for('verify_2fa'))
 
 
 # Simple health endpoint for Azure App Service health checks and probes

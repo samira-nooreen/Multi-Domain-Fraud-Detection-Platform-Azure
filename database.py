@@ -9,11 +9,12 @@ import json
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-_DEFAULT_DB_DIR = os.path.join(os.path.expanduser('~'), '.mdfdp')
+_DEFAULT_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'project.db')
 
 # Database file path. Azure/App Service deployments can override this with
-# DATABASE_PATH, but the default points to a writable home-directory location.
-DB_PATH = os.getenv('DATABASE_PATH', os.path.join(_DEFAULT_DB_DIR, 'project.db'))
+# DATABASE_PATH, while local runs default to the repository database file so
+# helper scripts and the web app use the same user store.
+DB_PATH = os.getenv('DATABASE_PATH', _DEFAULT_DB_PATH)
 
 
 def _ensure_db_directory():
@@ -89,6 +90,8 @@ def get_db_connection():
 
 def create_user(email, name, password):
     """Create a new user"""
+    email = (email or '').strip().lower()
+    name = (name or '').strip()
     conn = get_db_connection()
     try:
         password_hash = generate_password_hash(password)
@@ -107,6 +110,7 @@ def create_user(email, name, password):
 
 def get_user_by_email(email):
     """Get user by email"""
+    email = (email or '').strip().lower()
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
@@ -127,6 +131,7 @@ def get_user_by_id(user_id):
 
 def verify_user_password(email, password):
     """Verify user password"""
+    email = (email or '').strip().lower()
     user = get_user_by_email(email)
     if user and check_password_hash(user['password_hash'], password):
         # Update last login time
@@ -165,6 +170,19 @@ def get_user_totp_secret(user_id):
         cursor.execute('SELECT totp_secret FROM users WHERE id = ?', (user_id,))
         result = cursor.fetchone()
         return result['totp_secret'] if result else None
+    finally:
+        conn.close()
+
+def delete_user_account(user_id):
+    """Delete a user and related security/activity records."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM trusted_devices WHERE user_id = ?', (user_id,))
+        cursor.execute('DELETE FROM fraud_analysis_logs WHERE user_id = ?', (user_id,))
+        cursor.execute('DELETE FROM users WHERE id = ?', (user_id,))
+        conn.commit()
+        return cursor.rowcount > 0
     finally:
         conn.close()
 

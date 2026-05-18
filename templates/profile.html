@@ -1,978 +1,1152 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Profile - MDFDP</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        /* Profile Specific Styles */
-        .profile-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-            min-height: 80vh;
-        }
+      /* Profile Specific Styles */
+      .profile-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+        min-height: 80vh;
+      }
 
+      .profile-header {
+        background: #14141b;
+        border-radius: 15px;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 30px;
+        border: 1px solid #29293a;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .profile-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #8876f8, #7059d2, #38ef7d);
+      }
+
+      .profile-avatar {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #8876f8, #7059d2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: white;
+        box-shadow: 0 0 20px rgba(136, 118, 248, 0.4);
+        border: 3px solid #14141b;
+      }
+
+      .profile-title h1 {
+        margin: 0;
+        font-size: 2rem;
+        color: white;
+      }
+
+      .profile-title p {
+        color: #a0a0b0;
+        margin: 5px 0 0;
+      }
+
+      .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+      }
+
+      .profile-section {
+        background: #14141b;
+        border-radius: 15px;
+        padding: 25px;
+        border: 1px solid #29293a;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+        height: 100%;
+      }
+
+      .profile-section:hover {
+        transform: translateY(-5px);
+        border-color: #8876f8;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #29293a;
+      }
+
+      .section-header i {
+        color: #8876f8;
+        font-size: 1.2rem;
+        background: rgba(136, 118, 248, 0.1);
+        padding: 8px;
+        border-radius: 8px;
+      }
+
+      .section-header h3 {
+        margin: 0;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+        min-height: 38px;
+      }
+
+      .info-label {
+        color: #a0a0b0;
+      }
+
+      .info-value {
+        color: #e6e6e6;
+        font-weight: 500;
+      }
+
+      .badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .badge-success {
+        background: rgba(56, 239, 125, 0.15);
+        color: #38ef7d;
+        border: 1px solid rgba(56, 239, 125, 0.3);
+      }
+
+      .badge-warning {
+        background: rgba(245, 87, 108, 0.15);
+        color: #f5576c;
+        border: 1px solid rgba(245, 87, 108, 0.3);
+      }
+
+      .badge-info {
+        background: rgba(136, 118, 248, 0.15);
+        color: #8876f8;
+        border: 1px solid rgba(136, 118, 248, 0.3);
+      }
+
+      .badge-danger {
+        background: rgba(245, 87, 108, 0.15);
+        color: #f5576c;
+        border: 1px solid rgba(245, 87, 108, 0.3);
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 40px;
+        justify-content: flex-end;
+        margin-bottom: 40px;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #8876f8 0%, #7059d2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(136, 118, 248, 0.3);
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(235, 51, 73, 0.3);
+      }
+
+      .btn-secondary {
+        background: #29293a;
+        color: white;
+        border: 1px solid #444;
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 1px solid #8876f8;
+        color: #8876f8;
+      }
+
+      .btn-outline:hover {
+        background: rgba(136, 118, 248, 0.1);
+      }
+
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+
+      .btn-text {
+        background: none;
+        border: none;
+        color: #f5576c;
+        padding: 0;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+      }
+
+      /* List styles */
+      .device-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .device-list li {
+        background: #0d0d0f;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.9rem;
+        border: 1px solid #1f1f2e;
+      }
+
+      .device-icon {
+        color: #8876f8;
+        background: rgba(136, 118, 248, 0.1);
+        padding: 8px;
+        border-radius: 50%;
+      }
+
+      .module-tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .module-tag {
+        background: #0d0d0f;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        color: #a0a0b0;
+        border: 1px solid #29293a;
+      }
+
+      /* Additional Profile Styles */
+      .activity-timeline {
+        margin-top: 20px;
+        border-left: 2px solid #29293a;
+        padding-left: 20px;
+        position: relative;
+      }
+
+      .timeline-item {
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -26px;
+        top: 5px;
+        width: 10px;
+        height: 10px;
+        background: #8876f8;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(136, 118, 248, 0.5);
+      }
+
+      .timeline-time {
+        font-size: 0.8rem;
+        color: #a0a0b0;
+        margin-bottom: 4px;
+      }
+
+      .timeline-content {
+        color: #e6e6e6;
+        font-size: 0.9rem;
+      }
+
+      .login-history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 0.85rem;
+      }
+
+      .login-history-table th,
+      .login-history-table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #29293a;
+        color: #a0a0b0;
+      }
+
+      .login-history-table th {
+        color: #8876f8;
+        font-weight: 600;
+      }
+
+      /* Form Styles for Edit Mode */
+      .form-input,
+      .form-select {
+        background: #0d0d0f;
+        border: 1px solid #29293a;
+        color: #e6e6e6;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+
+      .form-input:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: #8876f8;
+      }
+
+      .edit-field {
+        display: none;
+      }
+
+      .edit-actions {
+        display: none;
+        margin-top: 15px;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      /* Toggle Switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: #8876f8;
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      /* Slider for confidence threshold */
+      .slider-container {
+        width: 100%;
+        margin: 15px 0;
+      }
+
+      .slider-range {
+        width: 100%;
+        height: 5px;
+        background: #29293a;
+        outline: none;
+        border-radius: 5px;
+      }
+
+      .slider-range::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #8876f8;
+        cursor: pointer;
+      }
+
+      .slider-value {
+        text-align: center;
+        color: #e6e6e6;
+        font-weight: 600;
+        margin-top: 5px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
         .profile-header {
-            background: #14141b;
-            border-radius: 15px;
-            padding: 30px;
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            margin-bottom: 30px;
-            border: 1px solid #29293a;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .profile-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #8876f8, #7059d2, #38ef7d);
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #8876f8, #7059d2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: white;
-            box-shadow: 0 0 20px rgba(136, 118, 248, 0.4);
-            border: 3px solid #14141b;
-        }
-
-        .profile-title h1 {
-            margin: 0;
-            font-size: 2rem;
-            color: white;
-        }
-
-        .profile-title p {
-            color: #a0a0b0;
-            margin: 5px 0 0;
+          flex-direction: column;
+          text-align: center;
         }
 
         .profile-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-        }
-
-        .profile-section {
-            background: #14141b;
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid #29293a;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
-        }
-
-        .profile-section:hover {
-            transform: translateY(-5px);
-            border-color: #8876f8;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #29293a;
-        }
-
-        .section-header i {
-            color: #8876f8;
-            font-size: 1.2rem;
-            background: rgba(136, 118, 248, 0.1);
-            padding: 8px;
-            border-radius: 8px;
-        }
-
-        .section-header h3 {
-            margin: 0;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 0.95rem;
-            min-height: 38px;
-        }
-
-        .info-label {
-            color: #a0a0b0;
-        }
-
-        .info-value {
-            color: #e6e6e6;
-            font-weight: 500;
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-success {
-            background: rgba(56, 239, 125, 0.15);
-            color: #38ef7d;
-            border: 1px solid rgba(56, 239, 125, 0.3);
-        }
-
-        .badge-warning {
-            background: rgba(245, 87, 108, 0.15);
-            color: #f5576c;
-            border: 1px solid rgba(245, 87, 108, 0.3);
-        }
-
-        .badge-info {
-            background: rgba(136, 118, 248, 0.15);
-            color: #8876f8;
-            border: 1px solid rgba(136, 118, 248, 0.3);
-        }
-
-        .badge-danger {
-            background: rgba(245, 87, 108, 0.15);
-            color: #f5576c;
-            border: 1px solid rgba(245, 87, 108, 0.3);
+          grid-template-columns: 1fr;
         }
 
         .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 40px;
-            justify-content: flex-end;
-            margin-bottom: 40px;
+          flex-direction: column;
         }
 
         .btn {
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            border: none;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
+          width: 100%;
+          justify-content: center;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #8876f8 0%, #7059d2 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(136, 118, 248, 0.3);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(235, 51, 73, 0.3);
-        }
-
-        .btn-secondary {
-            background: #29293a;
-            color: white;
-            border: 1px solid #444;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #8876f8;
-            color: #8876f8;
-        }
-
-        .btn-outline:hover {
-            background: rgba(136, 118, 248, 0.1);
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-
-        .btn-text {
-            background: none;
-            border: none;
-            color: #f5576c;
-            padding: 0;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
-        }
-
-        /* List styles */
-        .device-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .device-list li {
-            background: #0d0d0f;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.9rem;
-            border: 1px solid #1f1f2e;
-        }
-
-        .device-icon {
-            color: #8876f8;
-            background: rgba(136, 118, 248, 0.1);
-            padding: 8px;
-            border-radius: 50%;
-        }
-
-        .module-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .module-tag {
-            background: #0d0d0f;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            color: #a0a0b0;
-            border: 1px solid #29293a;
-        }
-
-        /* Additional Profile Styles */
-        .activity-timeline {
-            margin-top: 20px;
-            border-left: 2px solid #29293a;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .timeline-item {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -26px;
-            top: 5px;
-            width: 10px;
-            height: 10px;
-            background: #8876f8;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(136, 118, 248, 0.5);
-        }
-
-        .timeline-time {
-            font-size: 0.8rem;
-            color: #a0a0b0;
-            margin-bottom: 4px;
-        }
-
-        .timeline-content {
-            color: #e6e6e6;
-            font-size: 0.9rem;
-        }
-
-        .login-history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 0.85rem;
-        }
-
-        .login-history-table th,
-        .login-history-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #29293a;
-            color: #a0a0b0;
-        }
-
-        .login-history-table th {
-            color: #8876f8;
-            font-weight: 600;
-        }
-
-        /* Form Styles for Edit Mode */
-        .form-input,
-        .form-select {
-            background: #0d0d0f;
-            border: 1px solid #29293a;
-            color: #e6e6e6;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        .form-input:focus,
-        .form-select:focus {
-            outline: none;
-            border-color: #8876f8;
-        }
-
-        .edit-field {
-            display: none;
-        }
-
-        .edit-actions {
-            display: none;
-            margin-top: 15px;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        /* Toggle Switch */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked+.slider {
-            background-color: #8876f8;
-        }
-
-        input:checked+.slider:before {
-            transform: translateX(26px);
-        }
-
-        /* Slider for confidence threshold */
-        .slider-container {
-            width: 100%;
-            margin: 15px 0;
-        }
-
-        .slider-range {
-            width: 100%;
-            height: 5px;
-            background: #29293a;
-            outline: none;
-            border-radius: 5px;
-        }
-
-        .slider-range::-webkit-slider-thumb {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #8876f8;
-            cursor: pointer;
-        }
-
-        .slider-value {
-            text-align: center;
-            color: #e6e6e6;
-            font-weight: 600;
-            margin-top: 5px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .profile-header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <nav class="navbar">
-        <a href="/" class="navbar-logo">
-            <div class="shield-icon">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-                </svg>
-            </div>
-            <div class="navbar-logo-text">
-                Multi-Domain Fraud Detection <br>
-                <span style="font-weight: 700;">Platform (MDFDP)</span>
-            </div>
-        </a>
+      <a href="/" class="navbar-logo">
+        <div class="shield-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"
+            />
+          </svg>
+        </div>
+        <div class="navbar-logo-text">
+          Multi-Domain Fraud Detection <br />
+          <span style="font-weight: 700">Platform (MDFDP)</span>
+        </div>
+      </a>
 
-        <ul class="navbar-links">
-            <li><a href="/">Home</a></li>
-            <li><a href="/profile" class="active">Profile</a></li>
-            <li><a href="/logout" class="btn-danger">Logout</a></li>
-        </ul>
+      <ul class="navbar-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/profile" class="active">Profile</a></li>
+        <li><a href="/logout" class="btn-danger">Logout</a></li>
+      </ul>
     </nav>
 
     <div class="profile-container">
-        <!-- Header -->
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <i class="fas fa-user"></i>
+      <!-- Header -->
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="profile-title">
+          <h1>{{ user.name }}</h1>
+          <p>{{ email }}</p>
+          <div style="margin-top: 12px">
+            <span class="badge badge-info">Role: Analyst</span>
+            <span class="badge badge-success" style="margin-left: 8px"
+              >Status: Active</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <!-- 1. User Information -->
+        <div class="profile-section" id="userInfoSection">
+          <div class="section-header" style="justify-content: space-between">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <i class="fas fa-id-card"></i>
+              <h3>User Information</h3>
             </div>
-            <div class="profile-title">
-                <h1>{{ user.name }}</h1>
-                <p>{{ email }}</p>
-                <div style="margin-top: 12px;">
-                    <span class="badge badge-info">Role: Analyst</span>
-                    <span class="badge badge-success" style="margin-left: 8px;">Status: Active</span>
-                </div>
+            <button class="btn-text" onclick="toggleEdit('userInfoSection')">
+              <i class="fas fa-pen"></i> Edit
+            </button>
+          </div>
+          <form
+            id="userInfoForm"
+            onsubmit="
+              event.preventDefault();
+              saveEdit('userInfoSection');
+            "
+          >
+            <div class="info-row">
+              <span class="info-label">Full Name</span>
+              <span class="info-value display-field">{{ user.name }}</span>
+              <input
+                type="text"
+                name="name"
+                class="edit-field form-input"
+                value="{{ user.name }}"
+                style="display: none"
+              />
             </div>
+            <div class="info-row">
+              <span class="info-label">Email</span>
+              <span class="info-value">{{ email }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Phone</span>
+              <span class="info-value display-field">+91 98765 43210</span>
+              <input
+                type="text"
+                name="phone"
+                class="edit-field form-input"
+                value="+91 98765 43210"
+                style="display: none"
+              />
+            </div>
+            <div class="info-row">
+              <span class="info-label">Role</span>
+              <span class="info-value">Analyst</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Organization</span>
+              <span class="info-value display-field">CyberSec Corp</span>
+              <input
+                type="text"
+                name="org"
+                class="edit-field form-input"
+                value="CyberSec Corp"
+                style="display: none"
+              />
+            </div>
+            <div class="info-row">
+              <span class="info-label">Authentication Level</span>
+              <span class="info-value"
+                ><span class="badge badge-success">MFA Enabled</span></span
+              >
+            </div>
+            <div
+              class="edit-actions"
+              style="
+                display: none;
+                margin-top: 15px;
+                gap: 10px;
+                justify-content: flex-end;
+              "
+            >
+              <button
+                type="button"
+                class="btn btn-sm btn-secondary"
+                onclick="cancelEdit('userInfoSection')"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-sm btn-primary">Save</button>
+            </div>
+          </form>
         </div>
 
-        <div class="profile-grid">
-            <!-- 1. User Information -->
-            <div class="profile-section" id="userInfoSection">
-                <div class="section-header" style="justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <i class="fas fa-id-card"></i>
-                        <h3>User Information</h3>
-                    </div>
-                    <button class="btn-text" onclick="toggleEdit('userInfoSection')"><i class="fas fa-pen"></i> Edit</button>
+        <!-- 2. Account Security Settings -->
+        <div class="profile-section">
+          <div class="section-header">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Account Security</h3>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Password</span>
+            <button class="btn-text">Change Password</button>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Two-Factor Authentication</span>
+            <span class="info-value"
+              ><span class="badge badge-success">Enabled</span></span
+            >
+          </div>
+          <div class="info-row">
+            <span class="info-label">Hardware Security Key</span>
+            <span class="info-value"
+              ><span class="badge badge-warning">Not Configured</span></span
+            >
+          </div>
+          <div class="info-row">
+            <span class="info-label">Login Alerts</span>
+            <label class="switch">
+              <input type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Session Timeout</span>
+            <span class="info-value">30 minutes</span>
+          </div>
+          <div style="margin-top: 20px">
+            <h4 style="color: #e6e6e6; font-size: 1rem; margin-bottom: 10px">
+              Trusted Devices
+            </h4>
+            <ul class="device-list">
+              <li>
+                <i class="fas fa-laptop device-icon"></i>
+                <div>
+                  <div>Windows PC - Chrome</div>
+                  <div style="font-size: 0.8rem; color: #a0a0b0">
+                    Last used: Today, 10:30 AM
+                  </div>
                 </div>
-                <form id="userInfoForm" onsubmit="event.preventDefault(); saveEdit('userInfoSection');">
-                    <div class="info-row">
-                        <span class="info-label">Full Name</span>
-                        <span class="info-value display-field">{{ user.name }}</span>
-                        <input type="text" name="name" class="edit-field form-input" value="{{ user.name }}" style="display: none;">
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Email</span>
-                        <span class="info-value">{{ email }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Phone</span>
-                        <span class="info-value display-field">+91 98765 43210</span>
-                        <input type="text" name="phone" class="edit-field form-input" value="+91 98765 43210" style="display: none;">
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Role</span>
-                        <span class="info-value">Analyst</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Organization</span>
-                        <span class="info-value display-field">CyberSec Corp</span>
-                        <input type="text" name="org" class="edit-field form-input" value="CyberSec Corp" style="display: none;">
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Authentication Level</span>
-                        <span class="info-value"><span class="badge badge-success">MFA Enabled</span></span>
-                    </div>
-                    <div class="edit-actions" style="display: none; margin-top: 15px; gap: 10px; justify-content: flex-end;">
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit('userInfoSection')">Cancel</button>
-                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- 2. Account Security Settings -->
-            <div class="profile-section">
-                <div class="section-header">
-                    <i class="fas fa-shield-alt"></i>
-                    <h3>Account Security</h3>
+              </li>
+              <li>
+                <i class="fas fa-mobile device-icon"></i>
+                <div>
+                  <div>iPhone 12 - Safari</div>
+                  <div style="font-size: 0.8rem; color: #a0a0b0">
+                    Last used: Yesterday, 4:15 PM
+                  </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Password</span>
-                    <button class="btn-text">Change Password</button>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Two-Factor Authentication</span>
-                    <span class="info-value"><span class="badge badge-success">Enabled</span></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Hardware Security Key</span>
-                    <span class="info-value"><span class="badge badge-warning">Not Configured</span></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Login Alerts</span>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Session Timeout</span>
-                    <span class="info-value">30 minutes</span>
-                </div>
-                <div style="margin-top: 20px;">
-                    <h4 style="color: #e6e6e6; font-size: 1rem; margin-bottom: 10px;">Trusted Devices</h4>
-                    <ul class="device-list">
-                        <li>
-                            <i class="fas fa-laptop device-icon"></i>
-                            <div>
-                                <div>Windows PC - Chrome</div>
-                                <div style="font-size: 0.8rem; color: #a0a0b0;">Last used: Today, 10:30 AM</div>
-                            </div>
-                        </li>
-                        <li>
-                            <i class="fas fa-mobile device-icon"></i>
-                            <div>
-                                <div>iPhone 12 - Safari</div>
-                                <div style="font-size: 0.8rem; color: #a0a0b0;">Last used: Yesterday, 4:15 PM</div>
-                            </div>
-                        </li>
-                    </ul>
-                    <button class="btn btn-outline" style="width: 100%; margin-top: 15px;">
-                        <i class="fas fa-sign-out-alt"></i> Logout From All Other Devices
-                    </button>
-                </div>
-            </div>
-
-            <!-- 3. User Activity & Audit Logs -->
-            <div class="profile-section">
-                <div class="section-header">
-                    <i class="fas fa-history"></i>
-                    <h3>Activity & Audit Logs</h3>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Last Login</span>
-                    <span class="info-value">Today, 09:15 AM</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Last Password Change</span>
-                    <span class="info-value">2 weeks ago</span>
-                </div>
-                <div style="margin-top: 20px;">
-                    <h4 style="color: #e6e6e6; font-size: 1rem; margin-bottom: 10px;">Recent Login History</h4>
-                    <table class="login-history-table">
-                        <thead>
-                            <tr>
-                                <th>Date & Time</th>
-                                <th>IP Address</th>
-                                <th>Location</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Today, 09:15 AM</td>
-                                <td>192.168.1.100</td>
-                                <td>Mumbai, India</td>
-                            </tr>
-                            <tr>
-                                <td>Yesterday, 06:45 PM</td>
-                                <td>192.168.1.100</td>
-                                <td>Mumbai, India</td>
-                            </tr>
-                            <tr>
-                                <td>Dec 1, 11:30 AM</td>
-                                <td>203.122.45.67</td>
-                                <td>Delhi, India</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 4. Fraud Detection Preferences -->
-            <div class="profile-section" id="preferencesSection">
-                <div class="section-header" style="justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <i class="fas fa-bell"></i>
-                        <h3>Fraud Detection Preferences</h3>
-                    </div>
-                    <button class="btn-text" onclick="toggleEdit('preferencesSection')"><i class="fas fa-pen"></i> Edit</button>
-                </div>
-                <form id="preferencesForm" onsubmit="event.preventDefault(); saveEdit('preferencesSection');">
-                    <div class="info-row">
-                        <span class="info-label">Alert Threshold</span>
-                        <span class="info-value display-field">Medium Sensitivity</span>
-                        <select name="threshold" class="edit-field form-select" style="display: none;">
-                            <option value="low">Low Sensitivity</option>
-                            <option value="medium" selected>Medium Sensitivity</option>
-                            <option value="high">High Sensitivity</option>
-                        </select>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Notification Channels</span>
-                        <span class="info-value display-field">Email, In-App</span>
-                        <div class="edit-field" style="display: none;">
-                            <label style="display: block; margin-bottom: 5px;">
-                                <input type="checkbox" checked> Email
-                            </label>
-                            <label style="display: block; margin-bottom: 5px;">
-                                <input type="checkbox" checked> SMS
-                            </label>
-                            <label style="display: block;">
-                                <input type="checkbox" checked> In-App Ping
-                            </label>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Preferred Fraud Categories</span>
-                        <div>
-                            <div class="module-tags display-field">
-                                <span class="module-tag">UPI</span>
-                                <span class="module-tag">Credit Card</span>
-                                <span class="module-tag">Phishing</span>
-                            </div>
-                            <div class="edit-field" style="display: none;">
-                                <label style="display: block; margin-bottom: 5px;">
-                                    <input type="checkbox" checked> UPI
-                                </label>
-                                <label style="display: block; margin-bottom: 5px;">
-                                    <input type="checkbox" checked> Credit Card
-                                </label>
-                                <label style="display: block; margin-bottom: 5px;">
-                                    <input type="checkbox" checked> Phishing
-                                </label>
-                                <label style="display: block; margin-bottom: 5px;">
-                                    <input type="checkbox"> Identity Fraud
-                                </label>
-                                <label style="display: block;">
-                                    <input type="checkbox"> Document Forgery
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Dashboard Theme</span>
-                        <span class="info-value display-field">Dark Mode</span>
-                        <select name="theme" class="edit-field form-select" style="display: none;">
-                            <option value="dark" selected>Dark Mode</option>
-                            <option value="light">Light Mode</option>
-                            <option value="auto">Auto</option>
-                        </select>
-                    </div>
-                    <div class="edit-actions" style="display: none; margin-top: 15px; gap: 10px; justify-content: flex-end;">
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="cancelEdit('preferencesSection')">Cancel</button>
-                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- 5. Integrations & API Keys -->
-            <div class="profile-section">
-                <div class="section-header">
-                    <i class="fas fa-plug"></i>
-                    <h3>Integrations & API</h3>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">API Key</span>
-                    <span class="info-value" style="font-family: monospace;">••••••••••••a1b2</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">API Usage</span>
-                    <div style="text-align: right;">
-                        <span class="info-value">850 / 1000 requests</span>
-                        <div style="width: 100px; height: 4px; background: #29293a; border-radius: 2px; margin-top: 5px;">
-                            <div style="width: 85%; height: 100%; background: #8876f8; border-radius: 2px;"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Webhook URL</span>
-                    <span class="info-value" style="font-family: monospace; font-size: 0.8rem;">https://api.mdfdp.com/webhook</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Integration Status</span>
-                    <span class="info-value"><span class="badge badge-success">Active</span></span>
-                </div>
-                <div style="margin-top: 20px;">
-                    <h4 style="color: #e6e6e6; font-size: 1rem; margin-bottom: 10px;">Connected Systems</h4>
-                    <div class="info-row">
-                        <span class="info-label">Banking System</span>
-                        <span class="badge badge-success">Connected</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">CRM</span>
-                        <span class="badge badge-success">Connected</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Transaction Logs</span>
-                        <span class="badge badge-success">Connected</span>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button class="btn btn-secondary" style="flex: 1;"><i class="fas fa-sync"></i> Regenerate Key</button>
-                    <button class="btn btn-outline" style="flex: 1;"><i class="fas fa-chart-line"></i> View Stats</button>
-                </div>
-            </div>
-
-            <!-- 6. Reports & Saved Insights -->
-            <div class="profile-section">
-                <div class="section-header">
-                    <i class="fas fa-chart-bar"></i>
-                    <h3>Reports & Saved Insights</h3>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Saved Reports</span>
-                    <span class="info-value">12</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Bookmarked Analytics</span>
-                    <span class="info-value">5</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Exported Files</span>
-                    <span class="info-value">8</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Submitted Incidents</span>
-                    <span class="info-value">3</span>
-                </div>
-                <button class="btn btn-outline" style="width: 100%; margin-top: 15px;">
-                    <i class="fas fa-folder-open"></i> View All Saved Reports
-                </button>
-            </div>
-
-            <!-- 7. Model & Explainability Settings -->
-            <div class="profile-section">
-                <div class="section-header">
-                    <i class="fas fa-brain"></i>
-                    <h3>Model & Explainability</h3>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Model Version</span>
-                    <span class="info-value">v3.0 Phishing Classifier</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Explainability Method</span>
-                    <span class="info-value">SHAP</span>
-                </div>
-                <div style="margin-top: 20px;">
-                    <h4 style="color: #e6e6e6; font-size: 1rem; margin-bottom: 10px;">Confidence Threshold</h4>
-                    <div class="slider-container">
-                        <input type="range" min="0" max="100" value="75" class="slider-range">
-                        <div class="slider-value">75%</div>
-                    </div>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">High Recall Mode</span>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <button class="btn btn-outline" style="width: 100%; margin-top: 15px;">
-                    <i class="fas fa-cogs"></i> Model Settings
-                </button>
-            </div>
-
-            <!-- 8. User Access & Permissions -->
-            <div class="profile-section">
-                <div class="section-header">
-                    <i class="fas fa-users-cog"></i>
-                    <h3>User Access & Permissions</h3>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Current Role</span>
-                    <span class="info-value">Analyst</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Team Membership</span>
-                    <span class="info-value">Fraud Detection Team</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Access Levels</span>
-                    <div>
-                        <div class="module-tags">
-                            <span class="module-tag">UPI</span>
-                            <span class="module-tag">Credit Fraud</span>
-                            <span class="module-tag">Phishing</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Admin Privileges</span>
-                    <span class="info-value"><span class="badge badge-warning">None</span></span>
-                </div>
-                <button class="btn btn-outline" style="width: 100%; margin-top: 15px;">
-                    <i class="fas fa-user-plus"></i> Manage Team Members
-                </button>
-            </div>
-
-            <!-- 9. Compliance & Data Privacy -->
-            <div class="profile-section">
-                <div class="section-header">
-                    <i class="fas fa-file-contract"></i>
-                    <h3>Compliance & Data Privacy</h3>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Account Status</span>
-                    <span class="badge badge-success">Compliant</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">GDPR Consent</span>
-                    <span class="badge badge-success">Given</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Data Retention</span>
-                    <span class="info-value">2 Years</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Certifications</span>
-                    <div>
-                        <div class="module-tags">
-                            <span class="module-tag">SOC2</span>
-                            <span class="module-tag">ISO27001</span>
-                        </div>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-                    <button class="btn btn-secondary"><i class="fas fa-download"></i> Export Data</button>
-                    <button class="btn btn-danger"><i class="fas fa-trash"></i> Delete Account</button>
-                </div>
-            </div>
-
-            <!-- 10. Support & Connections -->
-            <div class="profile-section">
-                <div class="section-header">
-                    <i class="fas fa-headset"></i>
-                    <h3>Support & Connections</h3>
-                </div>
-                <div style="display: grid; gap: 10px;">
-                    <button class="btn btn-outline"><i class="fas fa-ticket-alt"></i> View Support Tickets</button>
-                    <button class="btn btn-outline"><i class="fas fa-robot"></i> Chat with Security Assistant</button>
-                    <button class="btn btn-outline"><i class="fas fa-envelope"></i> Contact Security Team</button>
-                    <button class="btn btn-outline"><i class="fas fa-book"></i> Documentation</button>
-                    <button class="btn btn-outline"><i class="fas fa-graduation-cap"></i> Training Materials</button>
-                </div>
-            </div>
+              </li>
+            </ul>
+            <button
+              class="btn btn-outline"
+              style="width: 100%; margin-top: 15px"
+            >
+              <i class="fas fa-sign-out-alt"></i> Logout From All Other Devices
+            </button>
+          </div>
         </div>
 
-        <div class="action-buttons">
-            <a href="/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Log Out</a>
-            <button class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+        <!-- 3. User Activity & Audit Logs -->
+        <div class="profile-section">
+          <div class="section-header">
+            <i class="fas fa-history"></i>
+            <h3>Activity & Audit Logs</h3>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Last Login</span>
+            <span class="info-value">Today, 09:15 AM</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Last Password Change</span>
+            <span class="info-value">2 weeks ago</span>
+          </div>
+          <div style="margin-top: 20px">
+            <h4 style="color: #e6e6e6; font-size: 1rem; margin-bottom: 10px">
+              Recent Login History
+            </h4>
+            <table class="login-history-table">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>IP Address</th>
+                  <th>Location</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Today, 09:15 AM</td>
+                  <td>192.168.1.100</td>
+                  <td>Mumbai, India</td>
+                </tr>
+                <tr>
+                  <td>Yesterday, 06:45 PM</td>
+                  <td>192.168.1.100</td>
+                  <td>Mumbai, India</td>
+                </tr>
+                <tr>
+                  <td>Dec 1, 11:30 AM</td>
+                  <td>203.122.45.67</td>
+                  <td>Delhi, India</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        <!-- 4. Fraud Detection Preferences -->
+        <div class="profile-section" id="preferencesSection">
+          <div class="section-header" style="justify-content: space-between">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <i class="fas fa-bell"></i>
+              <h3>Fraud Detection Preferences</h3>
+            </div>
+            <button class="btn-text" onclick="toggleEdit('preferencesSection')">
+              <i class="fas fa-pen"></i> Edit
+            </button>
+          </div>
+          <form
+            id="preferencesForm"
+            onsubmit="
+              event.preventDefault();
+              saveEdit('preferencesSection');
+            "
+          >
+            <div class="info-row">
+              <span class="info-label">Alert Threshold</span>
+              <span class="info-value display-field">Medium Sensitivity</span>
+              <select
+                name="threshold"
+                class="edit-field form-select"
+                style="display: none"
+              >
+                <option value="low">Low Sensitivity</option>
+                <option value="medium" selected>Medium Sensitivity</option>
+                <option value="high">High Sensitivity</option>
+              </select>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Notification Channels</span>
+              <span class="info-value display-field">Email, In-App</span>
+              <div class="edit-field" style="display: none">
+                <label style="display: block; margin-bottom: 5px">
+                  <input type="checkbox" checked /> Email
+                </label>
+                <label style="display: block; margin-bottom: 5px">
+                  <input type="checkbox" checked /> SMS
+                </label>
+                <label style="display: block">
+                  <input type="checkbox" checked /> In-App Ping
+                </label>
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Preferred Fraud Categories</span>
+              <div>
+                <div class="module-tags display-field">
+                  <span class="module-tag">UPI</span>
+                  <span class="module-tag">Credit Card</span>
+                  <span class="module-tag">Phishing</span>
+                </div>
+                <div class="edit-field" style="display: none">
+                  <label style="display: block; margin-bottom: 5px">
+                    <input type="checkbox" checked /> UPI
+                  </label>
+                  <label style="display: block; margin-bottom: 5px">
+                    <input type="checkbox" checked /> Credit Card
+                  </label>
+                  <label style="display: block; margin-bottom: 5px">
+                    <input type="checkbox" checked /> Phishing
+                  </label>
+                  <label style="display: block; margin-bottom: 5px">
+                    <input type="checkbox" /> Identity Fraud
+                  </label>
+                  <label style="display: block">
+                    <input type="checkbox" /> Document Forgery
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Dashboard Theme</span>
+              <span class="info-value display-field">Dark Mode</span>
+              <select
+                name="theme"
+                class="edit-field form-select"
+                style="display: none"
+              >
+                <option value="dark" selected>Dark Mode</option>
+                <option value="light">Light Mode</option>
+                <option value="auto">Auto</option>
+              </select>
+            </div>
+            <div
+              class="edit-actions"
+              style="
+                display: none;
+                margin-top: 15px;
+                gap: 10px;
+                justify-content: flex-end;
+              "
+            >
+              <button
+                type="button"
+                class="btn btn-sm btn-secondary"
+                onclick="cancelEdit('preferencesSection')"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-sm btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 5. Integrations & API Keys -->
+        <div class="profile-section">
+          <div class="section-header">
+            <i class="fas fa-plug"></i>
+            <h3>Integrations & API</h3>
+          </div>
+          <div class="info-row">
+            <span class="info-label">API Key</span>
+            <span class="info-value" style="font-family: monospace"
+              >••••••••••••a1b2</span
+            >
+          </div>
+          <div class="info-row">
+            <span class="info-label">API Usage</span>
+            <div style="text-align: right">
+              <span class="info-value">850 / 1000 requests</span>
+              <div
+                style="
+                  width: 100px;
+                  height: 4px;
+                  background: #29293a;
+                  border-radius: 2px;
+                  margin-top: 5px;
+                "
+              >
+                <div
+                  style="
+                    width: 85%;
+                    height: 100%;
+                    background: #8876f8;
+                    border-radius: 2px;
+                  "
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Webhook URL</span>
+            <span
+              class="info-value"
+              style="font-family: monospace; font-size: 0.8rem"
+              >https://api.mdfdp.com/webhook</span
+            >
+          </div>
+          <div class="info-row">
+            <span class="info-label">Integration Status</span>
+            <span class="info-value"
+              ><span class="badge badge-success">Active</span></span
+            >
+          </div>
+          <div style="margin-top: 20px">
+            <h4 style="color: #e6e6e6; font-size: 1rem; margin-bottom: 10px">
+              Connected Systems
+            </h4>
+            <div class="info-row">
+              <span class="info-label">Banking System</span>
+              <span class="badge badge-success">Connected</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">CRM</span>
+              <span class="badge badge-success">Connected</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Transaction Logs</span>
+              <span class="badge badge-success">Connected</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 15px">
+            <button class="btn btn-secondary" style="flex: 1">
+              <i class="fas fa-sync"></i> Regenerate Key
+            </button>
+            <button class="btn btn-outline" style="flex: 1">
+              <i class="fas fa-chart-line"></i> View Stats
+            </button>
+          </div>
+        </div>
+
+        <!-- 6. Reports & Saved Insights -->
+        <div class="profile-section">
+          <div class="section-header">
+            <i class="fas fa-chart-bar"></i>
+            <h3>Reports & Saved Insights</h3>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Saved Reports</span>
+            <span class="info-value">12</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Bookmarked Analytics</span>
+            <span class="info-value">5</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Exported Files</span>
+            <span class="info-value">8</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Submitted Incidents</span>
+            <span class="info-value">3</span>
+          </div>
+          <button class="btn btn-outline" style="width: 100%; margin-top: 15px">
+            <i class="fas fa-folder-open"></i> View All Saved Reports
+          </button>
+        </div>
+
+        <!-- 7. Model & Explainability Settings -->
+        <div class="profile-section">
+          <div class="section-header">
+            <i class="fas fa-brain"></i>
+            <h3>Model & Explainability</h3>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Model Version</span>
+            <span class="info-value">v3.0 Phishing Classifier</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Explainability Method</span>
+            <span class="info-value">SHAP</span>
+          </div>
+          <div style="margin-top: 20px">
+            <h4 style="color: #e6e6e6; font-size: 1rem; margin-bottom: 10px">
+              Confidence Threshold
+            </h4>
+            <div class="slider-container">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value="75"
+                class="slider-range"
+              />
+              <div class="slider-value">75%</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <span class="info-label">High Recall Mode</span>
+            <label class="switch">
+              <input type="checkbox" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <button class="btn btn-outline" style="width: 100%; margin-top: 15px">
+            <i class="fas fa-cogs"></i> Model Settings
+          </button>
+        </div>
+
+        <!-- 8. User Access & Permissions -->
+        <div class="profile-section">
+          <div class="section-header">
+            <i class="fas fa-users-cog"></i>
+            <h3>User Access & Permissions</h3>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Current Role</span>
+            <span class="info-value">Analyst</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Team Membership</span>
+            <span class="info-value">Fraud Detection Team</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Access Levels</span>
+            <div>
+              <div class="module-tags">
+                <span class="module-tag">UPI</span>
+                <span class="module-tag">Credit Fraud</span>
+                <span class="module-tag">Phishing</span>
+              </div>
+            </div>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Admin Privileges</span>
+            <span class="info-value"
+              ><span class="badge badge-warning">None</span></span
+            >
+          </div>
+          <button class="btn btn-outline" style="width: 100%; margin-top: 15px">
+            <i class="fas fa-user-plus"></i> Manage Team Members
+          </button>
+        </div>
+
+        <!-- 9. Compliance & Data Privacy -->
+        <div class="profile-section">
+          <div class="section-header">
+            <i class="fas fa-file-contract"></i>
+            <h3>Compliance & Data Privacy</h3>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Account Status</span>
+            <span class="badge badge-success">Compliant</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">GDPR Consent</span>
+            <span class="badge badge-success">Given</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Data Retention</span>
+            <span class="info-value">2 Years</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Certifications</span>
+            <div>
+              <div class="module-tags">
+                <span class="module-tag">SOC2</span>
+                <span class="module-tag">ISO27001</span>
+              </div>
+            </div>
+          </div>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              margin-top: 15px;
+            "
+          >
+            <button class="btn btn-secondary">
+              <i class="fas fa-download"></i> Export Data
+            </button>
+            <form
+              method="POST"
+              action="{{ url_for('reset_2fa') }}"
+              onsubmit="
+                return confirm(
+                  'This will generate a fresh 2FA secret and show a new QR code. Continue?',
+                );
+              "
+              style="margin: 0"
+            >
+              <button type="submit" class="btn btn-danger" style="width: 100%">
+                <i class="fas fa-qrcode"></i> Reset 2FA / New QR
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 10. Support & Connections -->
+        <div class="profile-section">
+          <div class="section-header">
+            <i class="fas fa-headset"></i>
+            <h3>Support & Connections</h3>
+          </div>
+          <div style="display: grid; gap: 10px">
+            <button class="btn btn-outline">
+              <i class="fas fa-ticket-alt"></i> View Support Tickets
+            </button>
+            <button class="btn btn-outline">
+              <i class="fas fa-robot"></i> Chat with Security Assistant
+            </button>
+            <button class="btn btn-outline">
+              <i class="fas fa-envelope"></i> Contact Security Team
+            </button>
+            <button class="btn btn-outline">
+              <i class="fas fa-book"></i> Documentation
+            </button>
+            <button class="btn btn-outline">
+              <i class="fas fa-graduation-cap"></i> Training Materials
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <a href="/logout" class="btn btn-danger"
+          ><i class="fas fa-sign-out-alt"></i> Log Out</a
+        >
+        <button class="btn btn-primary">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+      </div>
     </div>
 
     <script>
-        function toggleEdit(sectionId) {
-            const section = document.getElementById(sectionId);
-            const displayFields = section.querySelectorAll('.display-field');
-            const editFields = section.querySelectorAll('.edit-field');
-            const editActions = section.querySelector('.edit-actions');
-            const editBtn = section.querySelector('.section-header .btn-text');
+      function toggleEdit(sectionId) {
+        const section = document.getElementById(sectionId);
+        const displayFields = section.querySelectorAll(".display-field");
+        const editFields = section.querySelectorAll(".edit-field");
+        const editActions = section.querySelector(".edit-actions");
+        const editBtn = section.querySelector(".section-header .btn-text");
 
-            displayFields.forEach(el => el.style.display = 'none');
-            editFields.forEach(el => el.style.display = 'block');
-            if (editActions) editActions.style.display = 'flex';
-            if (editBtn) editBtn.style.display = 'none';
-        }
+        displayFields.forEach((el) => (el.style.display = "none"));
+        editFields.forEach((el) => (el.style.display = "block"));
+        if (editActions) editActions.style.display = "flex";
+        if (editBtn) editBtn.style.display = "none";
+      }
 
-        function cancelEdit(sectionId) {
-            const section = document.getElementById(sectionId);
-            const displayFields = section.querySelectorAll('.display-field');
-            const editFields = section.querySelectorAll('.edit-field');
-            const editActions = section.querySelector('.edit-actions');
-            const editBtn = section.querySelector('.section-header .btn-text');
+      function cancelEdit(sectionId) {
+        const section = document.getElementById(sectionId);
+        const displayFields = section.querySelectorAll(".display-field");
+        const editFields = section.querySelectorAll(".edit-field");
+        const editActions = section.querySelector(".edit-actions");
+        const editBtn = section.querySelector(".section-header .btn-text");
 
-            displayFields.forEach(el => el.style.display = 'block');
-            editFields.forEach(el => el.style.display = 'none');
-            if (editActions) editActions.style.display = 'none';
-            if (editBtn) editBtn.style.display = 'block';
-        }
+        displayFields.forEach((el) => (el.style.display = "block"));
+        editFields.forEach((el) => (el.style.display = "none"));
+        if (editActions) editActions.style.display = "none";
+        if (editBtn) editBtn.style.display = "block";
+      }
 
-        function saveEdit(sectionId) {
-            // Here you would typically send an AJAX request to save the data
-            // For now, we'll just update the display values to match the inputs
-            const section = document.getElementById(sectionId);
-            const inputs = section.querySelectorAll('.edit-field');
+      function saveEdit(sectionId) {
+        // Here you would typically send an AJAX request to save the data
+        // For now, we'll just update the display values to match the inputs
+        const section = document.getElementById(sectionId);
+        const inputs = section.querySelectorAll(".edit-field");
 
-            inputs.forEach(input => {
-                const displayField = input.previousElementSibling;
+        inputs.forEach((input) => {
+          const displayField = input.previousElementSibling;
 
-                if (displayField && displayField.classList.contains('display-field')) {
-                    if (input.tagName === 'SELECT') {
-                        displayField.textContent = input.options[input.selectedIndex].text;
-                    }
-                    else if (input.type === 'checkbox') {
-                        // Handle checkboxes differently
-                    }
-                    else {
-                        displayField.textContent = input.value;
-                    }
-                }
-            });
-
-            // Show success message (optional)
-            alert('Changes saved successfully!');
-
-            cancelEdit(sectionId);
-        }
-
-        // Update slider value display
-        const sliders = document.querySelectorAll('.slider-range');
-        sliders.forEach(slider => {
-            const valueDisplay = slider.nextElementSibling;
-            valueDisplay.textContent = slider.value + '%';
-
-            slider.oninput = function() {
-                valueDisplay.textContent = this.value + '%';
+          if (
+            displayField &&
+            displayField.classList.contains("display-field")
+          ) {
+            if (input.tagName === "SELECT") {
+              displayField.textContent =
+                input.options[input.selectedIndex].text;
+            } else if (input.type === "checkbox") {
+              // Handle checkboxes differently
+            } else {
+              displayField.textContent = input.value;
             }
+          }
         });
-    </script>
-</body>
 
+        // Show success message (optional)
+        alert("Changes saved successfully!");
+
+        cancelEdit(sectionId);
+      }
+
+      // Update slider value display
+      const sliders = document.querySelectorAll(".slider-range");
+      sliders.forEach((slider) => {
+        const valueDisplay = slider.nextElementSibling;
+        valueDisplay.textContent = slider.value + "%";
+
+        slider.oninput = function () {
+          valueDisplay.textContent = this.value + "%";
+        };
+      });
+    </script>
+  </body>
 </html>
