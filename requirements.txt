@@ -1,5 +1,5 @@
 # Multi-Domain Fraud Detection Platform - Production Requirements
-# Optimized for Render free tier (512MB RAM, 15-min build limit)
+# Target deployment: Azure App Service (use App Service plan appropriate for ML models)
 
 # Core Web Framework
 Flask>=3.1.0
@@ -86,4 +86,4 @@ gunicorn>=23.0.0
 # Optional: OpenTelemetry + Azure Monitor exporter for Application Insights (install only if enabling monitoring)
 opentelemetry-sdk>=1.19.0
 opentelemetry-instrumentation-flask>=0.36b0
-azure-monitor-opentelemetry-exporter>=1.0.0
+azure-monitor-opentelemetry-exporter==1.0.0b52

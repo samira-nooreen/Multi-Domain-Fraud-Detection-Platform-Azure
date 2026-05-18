@@ -119,5 +119,4 @@ Thumbs.db
 # Orchids
 .orchids/
 
-# Render (not needed for Railway)
-render.yaml
+# Render/railway config removed — using Azure
