@@ -6,22 +6,22 @@
 flowchart LR
   Dev[Developer]
   GH[GitHub Repo]
-  CI[CI/CD (GitHub Actions)]
-  Reg[Container Registry\n(ACR / Docker Hub)]
+  CI[GitHub Actions]
+  Reg[Container Registry]
   Deploy[Deployment Trigger]
   LB[Load Balancer]
-  Cluster[Hosting (Azure App Service / AKS)]
-  Container[Docker Container\n(App + Gunicorn/Uvicorn)]
+  Cluster[Azure App Service]
+  Container[Docker Container]
   App[Application API]
-  Model[Model & Artifacts\n(Azure Blob Storage)]
-  DB[Database\n(Azure SQL / PostgreSQL)]
+  Model[Model Artifacts]
+  DB[Database]
   Cache[Redis Cache]
   KV[Azure Key Vault]
-  Users[Users / Clients]
-  Monitor[Monitoring / Logging\n(Azure Monitor / Log Analytics / Prometheus)]
+  Users[Users/Clients]
+  Monitor[Monitoring]
 
   Dev --> |push| GH
-  GH --> |CI pipeline: build/test| CI
+  GH --> |CI pipeline| CI
   CI --> |build image| Reg
   CI --> |deploy| Deploy
   Deploy --> Reg
@@ -35,17 +35,7 @@ flowchart LR
   App --> Cache
   App --> KV
   Cluster --> Monitor
-  Cluster --> Monitor -->|alerts/logs| Dev
-
-  subgraph Optional Components
-    CDN[CDN / Static Assets]
-    EmailSrv[External Email / 3rd-party APIs]
-    FeatureFlags[Feature Flag Service]
-  end
-
-  App --> CDN
-  App --> EmailSrv
-  App --> FeatureFlags
+  Monitor --> |alerts| Dev
 
   classDef cloud fill:#f3f7ff,stroke:#0366d6;
   class Cluster,Reg,Model,DB,KV cloud;
@@ -55,23 +45,22 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  Users[Users / Clients]
-  Browser[Web Client (Browser)]
+  Users[Users/Clients]
+  Browser[Web Client]
   Mobile[Mobile Clients]
-  CDN[CDN / Static Assets]
-  LB[Load Balancer / API Gateway]
-  API[Flask API (Gunicorn / Uvicorn)]
-  Auth[Auth & Sessions]
+  CDN[CDN]
+  LB[Load Balancer]
+  API[Flask API]
+  Auth[Auth Sessions]
   ML[ML Modules]
-  ModelStore[Model Artifacts\n(Azure Blob Storage)]
-  DB[Database\n(SQLite / Azure SQL)]
-  Cache[Redis Cache]
-  Queue[Message Queue\n(RabbitMQ / Redis)]
-  Workers[Background Workers\n(Celery / RQ)]
+  ModelStore[Model Artifacts]
+  DB[Database]
+  Cache[Redis]
+  Queue[Message Queue]
+  Workers[Background Workers]
   Admin[Admin Dashboard]
-  External[External Services\n(Email, 3rd-party APIs)]
-  Monitoring[Monitoring / Logging\n(Azure Monitor / Prometheus / ELK)]
-  DevOps[DevOps / Alerts]
+  External[External Services]
+  Monitoring[Monitoring]
 
   Users --> Browser
   Users --> Mobile
