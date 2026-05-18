@@ -73,9 +73,14 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=os.getenv('SOCKETIO_ASYNC_MODE', 'threading'))
 
 # Optional: Application Insights / OpenTelemetry instrumentation (enabled when
-# `AZURE_MONITOR_CONNECTION_STRING` env var is set and required packages are installed).
+# `APPLICATIONINSIGHTS_CONNECTION_STRING` or `AZURE_MONITOR_CONNECTION_STRING`
+# env var is set and required packages are installed).
+monitor_connection_string = (
+    os.getenv('APPLICATIONINSIGHTS_CONNECTION_STRING')
+    or os.getenv('AZURE_MONITOR_CONNECTION_STRING')
+)
 try:
-    if os.getenv('AZURE_MONITOR_CONNECTION_STRING'):
+    if monitor_connection_string:
         from opentelemetry import trace
         from opentelemetry.instrumentation.flask import FlaskInstrumentor
         from opentelemetry.sdk.trace import TracerProvider
@@ -83,7 +88,7 @@ try:
         from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
 
         tp = TracerProvider()
-        exporter = AzureMonitorTraceExporter(connection_string=os.getenv('AZURE_MONITOR_CONNECTION_STRING'))
+        exporter = AzureMonitorTraceExporter(connection_string=monitor_connection_string)
         tp.add_span_processor(BatchSpanProcessor(exporter))
         trace.set_tracer_provider(tp)
         FlaskInstrumentor().instrument_app(app)
@@ -92,19 +97,19 @@ except Exception as _ex:
     # Failsafe: don't crash if optional packages are missing or misconfigured
     app.logger.info('Azure Monitor not enabled: %s', str(_ex))
 
-    # Initialize database and perform optional migration after app exists so
-    # failures don't crash the WSGI importer (fail open and log instead).
+# Initialize database and perform optional migration after app exists so
+# failures don't crash the WSGI importer (fail open and log instead).
+try:
+    init_db()
     try:
-        init_db()
-        try:
-            migrate_from_json()
-        except Exception:
-            # Not critical; migration is best-effort
-            app.logger.info('No JSON migration performed or migration failed')
-    except Exception as e:
-        # Log and continue; app should still start so health checks can report
-        # accurate errors instead of the process dying during import.
-        app.logger.error('Database initialization failed: %s', str(e))
+        migrate_from_json()
+    except Exception:
+        # Not critical; migration is best-effort
+        app.logger.info('No JSON migration performed or migration failed')
+except Exception as e:
+    # Log and continue; app should still start so health checks can report
+    # accurate errors instead of the process dying during import.
+    app.logger.error('Database initialization failed: %s', str(e))
 
 # Add ml_modules to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'ml_modules'))
