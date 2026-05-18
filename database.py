@@ -301,5 +301,9 @@ def migrate_from_json():
     
     return migrated_count
 
-# Initialize database on module import
-init_db()
+if __name__ == '__main__':
+    try:
+        init_db()
+        print('Database initialized')
+    except Exception as e:
+        print(f'Database initialization failed: {e}')

@@ -13,6 +13,7 @@ import numpy as np
 import joblib
 import os
 import sys
+import importlib
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -45,12 +46,6 @@ except ImportError:
 # Import database module
 from database import *
 
-# Initialize database
-init_db()
-
-# Migrate existing users from JSON to SQLite (one-time operation)
-migrate_from_json()
-
 # Login required decorator
 def login_required(f):
     @wraps(f)
@@ -77,8 +72,69 @@ CORS(app)
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=os.getenv('SOCKETIO_ASYNC_MODE', 'threading'))
 
+# Optional: Application Insights / OpenTelemetry instrumentation (enabled when
+# `AZURE_MONITOR_CONNECTION_STRING` env var is set and required packages are installed).
+try:
+    if os.getenv('AZURE_MONITOR_CONNECTION_STRING'):
+        from opentelemetry import trace
+        from opentelemetry.instrumentation.flask import FlaskInstrumentor
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+        from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter
+
+        tp = TracerProvider()
+        exporter = AzureMonitorTraceExporter(connection_string=os.getenv('AZURE_MONITOR_CONNECTION_STRING'))
+        tp.add_span_processor(BatchSpanProcessor(exporter))
+        trace.set_tracer_provider(tp)
+        FlaskInstrumentor().instrument_app(app)
+        app.logger.info('Azure Monitor instrumentation enabled')
+except Exception as _ex:
+    # Failsafe: don't crash if optional packages are missing or misconfigured
+    app.logger.info('Azure Monitor not enabled: %s', str(_ex))
+
+    # Initialize database and perform optional migration after app exists so
+    # failures don't crash the WSGI importer (fail open and log instead).
+    try:
+        init_db()
+        try:
+            migrate_from_json()
+        except Exception:
+            # Not critical; migration is best-effort
+            app.logger.info('No JSON migration performed or migration failed')
+    except Exception as e:
+        # Log and continue; app should still start so health checks can report
+        # accurate errors instead of the process dying during import.
+        app.logger.error('Database initialization failed: %s', str(e))
+
 # Add ml_modules to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'ml_modules'))
+
+# Detector cache and lazy loader to avoid expensive imports and model loads
+_detector_cache = {}
+def get_detector(module_path, class_name, init_kwargs=None, reload_module=False):
+    """Lazily import and instantiate a detector class and cache the instance.
+
+    module_path: str e.g. 'ml_modules.upi_fraud.predict'
+    class_name: str e.g. 'UPIFraudDetector'
+    init_kwargs: dict of constructor kwargs
+    reload_module: if True, force reload the module before instantiation
+    """
+    key = f"{module_path}:{class_name}"
+    if key in _detector_cache and not reload_module:
+        return _detector_cache[key]
+
+    try:
+        module = importlib.import_module(module_path)
+        if reload_module:
+            importlib.reload(module)
+        cls = getattr(module, class_name)
+        kwargs = init_kwargs or {}
+        instance = cls(**kwargs) if kwargs else cls()
+        _detector_cache[key] = instance
+        return instance
+    except Exception as e:
+        app.logger.error('Failed to load detector %s.%s: %s', module_path, class_name, str(e))
+        raise
 
 # Global variable to store fraud data
 fraud_data_store = [
@@ -393,6 +449,21 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+
+# Simple health endpoint for Azure App Service health checks and probes
+@app.route('/health', methods=['GET'])
+def health():
+    """Health check endpoint. Returns 200 and a minimal payload."""
+    try:
+        # Quick DB check (lightweight)
+        conn = get_db_connection()
+        conn.execute('SELECT 1')
+        conn.close()
+        return jsonify({'status': 'ok', 'time': datetime.utcnow().isoformat()}), 200
+    except Exception as e:
+        app.logger.error('Health check failed: %s', str(e))
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 # ==================== HOME ROUTE ====================
 @app.route('/')
 @login_required
@@ -415,11 +486,14 @@ def detect_upi():
         # Get transaction data from request
         data = request.json
         
-        # Load UPI fraud detector
-        from ml_modules.upi_fraud.predict import UPIFraudDetector
-        detector = UPIFraudDetector(
-            model_path='ml_modules/upi_fraud/upi_fraud_model.pkl',
-            scaler_path='ml_modules/upi_fraud/upi_fraud_scaler.pkl'
+        # Lazy-load UPI fraud detector (cached)
+        detector = get_detector(
+            'ml_modules.upi_fraud.predict',
+            'UPIFraudDetector',
+            init_kwargs={
+                'model_path': 'ml_modules/upi_fraud/upi_fraud_model.pkl',
+                'scaler_path': 'ml_modules/upi_fraud/upi_fraud_scaler.pkl'
+            }
         )
         
         # Prepare transaction data with minimal inputs
@@ -465,13 +539,15 @@ def detect_credit():
     
     try:
         data = request.json
-        from ml_modules.credit_card.predict import CreditCardFraudDetector
-        
-        # Initialize detector
-        detector = CreditCardFraudDetector(
-            model_path='ml_modules/credit_card/credit_card_model.pkl',
-            scaler_path='ml_modules/credit_card/credit_card_scaler.pkl',
-            features_path='ml_modules/credit_card/credit_card_features.pkl'
+        # Lazy-load Credit Card detector
+        detector = get_detector(
+            'ml_modules.credit_card.predict',
+            'CreditCardFraudDetector',
+            init_kwargs={
+                'model_path': 'ml_modules/credit_card/credit_card_model.pkl',
+                'scaler_path': 'ml_modules/credit_card/credit_card_scaler.pkl',
+                'features_path': 'ml_modules/credit_card/credit_card_features.pkl'
+            }
         )
         
         # Prepare transaction data with minimal inputs
@@ -519,10 +595,13 @@ def detect_loan():
         return render_template('loan_default.html')
     try:
         data = request.json
-        from ml_modules.loan_default.predict import LoanDefaultPredictor
-        detector = LoanDefaultPredictor(
-            model_path='ml_modules/loan_default/loan_model.pkl',
-            encoder_path='ml_modules/loan_default/loan_encoders.pkl'
+        detector = get_detector(
+            'ml_modules.loan_default.predict',
+            'LoanDefaultPredictor',
+            init_kwargs={
+                'model_path': 'ml_modules/loan_default/loan_model.pkl',
+                'encoder_path': 'ml_modules/loan_default/loan_encoders.pkl'
+            }
         )
         result = detector.predict(data)
 
@@ -557,10 +636,10 @@ def detect_insurance():
     
     try:
         data = request.json
-        from ml_modules.insurance_fraud.predict import InsuranceFraudDetector
-        
-        # Initialize detector (it loads models from its directory automatically)
-        detector = InsuranceFraudDetector()
+        detector = get_detector(
+            'ml_modules.insurance_fraud.predict',
+            'InsuranceFraudDetector'
+        )
         result = detector.predict(data)
         
         # Add currency formatting
@@ -593,8 +672,11 @@ def detect_click():
         return render_template('click_fraud.html')
     try:
         data = request.json or {}
-        from ml_modules.click_fraud.predict import ClickFraudDetector
-        detector = ClickFraudDetector(model_dir='ml_modules/click_fraud')
+        detector = get_detector(
+            'ml_modules.click_fraud.predict',
+            'ClickFraudDetector',
+            init_kwargs={'model_dir': 'ml_modules/click_fraud'}
+        )
         
         # Get sequence directly if provided
         seq = data.get('sequence')
@@ -734,8 +816,11 @@ def detect_fake_news():
         
         # Use DJDarkCyber fake news detector
         try:
-            from ml_modules.fake_news.predict import DJDarkCyberFakeNewsDetector
-            detector = DJDarkCyberFakeNewsDetector(model_dir='ml_modules/fake_news/models')
+            detector = get_detector(
+                'ml_modules.fake_news.predict',
+                'DJDarkCyberFakeNewsDetector',
+                init_kwargs={'model_dir': 'ml_modules/fake_news/models'}
+            )
             
             # Split text into title and body
             lines = text.split('\n')
@@ -1061,10 +1146,14 @@ def detect_spam():
         if module_name in sys.modules:
             del sys.modules[module_name]
         
-        from ml_modules.spam_email.predict import SpamDetector
-        detector = SpamDetector(
-            model_path='ml_modules/spam_email/spam_model.pkl',
-            vec_path='ml_modules/spam_email/spam_vectorizer.pkl'
+        detector = get_detector(
+            'ml_modules.spam_email.predict',
+            'SpamDetector',
+            init_kwargs={
+                'model_path': 'ml_modules/spam_email/spam_model.pkl',
+                'vec_path': 'ml_modules/spam_email/spam_vectorizer.pkl'
+            },
+            reload_module=True
         )
         
         # Process minimal inputs
@@ -1120,8 +1209,11 @@ def detect_phishing():
         if module_name in sys.modules:
             del sys.modules[module_name]
 
-        from ml_modules.phishing_url.predict import PhishingDetector
-        detector = PhishingDetector(model_path='ml_modules/phishing_url/phishing_model.pkl')
+        detector = get_detector(
+            'ml_modules.phishing_url.predict',
+            'PhishingDetector',
+            init_kwargs={'model_path': 'ml_modules/phishing_url/phishing_model.pkl'}
+        )
         url_value = data.get('url', '')
         result = detector.predict(url_value)
 
@@ -1180,10 +1272,12 @@ def detect_bot():
     
     try:
         data = request.json
-        from ml_modules.fake_profile.predict import BotDetector
-        
-        # Initialize detector with correct model directory
-        detector = BotDetector(model_dir='ml_modules/fake_profile')
+        # Lazy-load bot detector
+        detector = get_detector(
+            'ml_modules.fake_profile.predict',
+            'BotDetector',
+            init_kwargs={'model_dir': 'ml_modules/fake_profile'}
+        )
         
         # Prepare data with minimal inputs
         profile_data = {
@@ -1225,7 +1319,11 @@ def detect_forgery():
         return render_template('document_forgery.html')
     
     try:
-        from ml_modules.document_forgery.predict import ForgeryDetector
+        # Lazy-load document forgery detector
+        detector = get_detector(
+            'ml_modules.document_forgery.predict',
+            'ForgeryDetector'
+        )
         
         # Handle file upload
         if 'document_image' in request.files:
@@ -1238,8 +1336,13 @@ def detect_forgery():
                 file_path = os.path.join(temp_dir, file.filename)
                 file.save(file_path)
                 
-                # Initialize detector
-                detector = ForgeryDetector(model_path='ml_modules/document_forgery/forgery_model.pkl')
+                # detector already initialized above; set model path if needed
+                try:
+                    # some detectors accept model_path parameter via method or attr
+                    if hasattr(detector, 'set_model_path'):
+                        detector.set_model_path('ml_modules/document_forgery/forgery_model.pkl')
+                except Exception:
+                    pass
                 
                 # Predict using the uploaded image
                 result = detector.predict(file_path)
@@ -1318,8 +1421,11 @@ def detect_brand_abuse():
                 # For now, we'll just note that images were uploaded
                 data['images_uploaded'] = len([f for f in image_files if f.filename])
         
-        from ml_modules.brand_abuse.predict import BrandAbuseDetector
-        detector = BrandAbuseDetector(model_path='ml_modules/brand_abuse/brand_abuse_model.pkl')
+        detector = get_detector(
+            'ml_modules.brand_abuse.predict',
+            'BrandAbuseDetector',
+            init_kwargs={'model_path': 'ml_modules/brand_abuse/brand_abuse_model.pkl'}
+        )
         result = detector.predict(data)
         
         # Log to database if user is logged in
@@ -1879,8 +1985,7 @@ def chat():
         data = request.json
         message = data.get('message', '')
         
-        from ml_modules.chatbot import MDFDPBot
-        bot = MDFDPBot()
+        bot = get_detector('ml_modules.chatbot', 'MDFDPBot')
         response = bot.get_response(message)
         
         return jsonify({
