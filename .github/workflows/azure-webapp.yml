@@ -65,36 +65,9 @@ jobs:
       - name: Validate core app files
         run: python -m compileall app.py database.py
 
-      - name: Ensure Azure credentials are available
-        id: cred-check
-        run: |
-          if [ -n "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}" ]; then
-            echo "publish-profile=present" >> $GITHUB_OUTPUT
-          else
-            echo "publish-profile=missing" >> $GITHUB_OUTPUT
-          fi
-          if [ -n "${{ secrets.AZURE_CREDENTIALS }}" ]; then
-            echo "sp=present" >> $GITHUB_OUTPUT
-          else
-            echo "sp=missing" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Azure Login (service principal)
-        if: steps.cred-check.outputs.sp == 'present'
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Deploy to Azure Web App (publish profile)
-        if: steps.cred-check.outputs.publish-profile == 'present'
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ./deploy
-
-      - name: Fail if no Azure credentials found
-        if: steps.cred-check.outputs.publish-profile == 'missing' && steps.cred-check.outputs.sp == 'missing'
-        run: |
-          echo "\nERROR: No Azure deployment credentials found. Add one of the following secrets to this repository:\n  - AZURE_WEBAPP_PUBLISH_PROFILE (publish profile XML) OR\n  - AZURE_CREDENTIALS (service principal JSON)\nFollow the README or https://github.com/azure/login for details.\n" >&2
-          exit 1
