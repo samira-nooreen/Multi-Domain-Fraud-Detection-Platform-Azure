@@ -254,7 +254,7 @@
             <h2>Transaction Details</h2>
             <form id="upiForm">
                 <div class="form-group">
-                    <label for="amount">Transaction Amount (â‚¹)</label>
+                    <label for="amount">Transaction Amount (&#8377;)</label>
                     <input type="number" id="amount" name="amount" step="0.01" required placeholder="Enter amount">
                 </div>
                 
@@ -322,7 +322,7 @@
                 
                 <div class="detail-item">
                     <div class="detail-label">Transaction Amount</div>
-                    <div class="detail-value" id="transAmount">â‚¹0</div>
+                    <div class="detail-value" id="transAmount">&#8377;0</div>
                 </div>
             </div>
             
@@ -416,7 +416,7 @@
             document.getElementById('fraudProb').textContent = '0%';
             document.getElementById('legitProb').textContent = '0%';
             document.getElementById('riskLevel').innerHTML = '<span class="risk-badge risk-low">LOW</span>';
-            document.getElementById('transAmount').textContent = 'â‚¹0';
+            document.getElementById('transAmount').textContent = '\u20b90';
             document.getElementById('recommendation').textContent = 'Analyzing transaction...';
             
             // Clear risk factors
@@ -468,7 +468,7 @@
             const riskBadge = `<span class="risk-badge risk-${result.risk_level.toLowerCase()}">${result.risk_level}</span>`;
             document.getElementById('riskLevel').innerHTML = riskBadge;
             
-            document.getElementById('transAmount').textContent = 'â‚¹' + parseFloat(amount).toLocaleString('en-IN');
+            document.getElementById('transAmount').textContent = '\u20b9' + parseFloat(amount).toLocaleString('en-IN');
             document.getElementById('recommendation').textContent = result.recommendation;
             
             // Display risk factors if present

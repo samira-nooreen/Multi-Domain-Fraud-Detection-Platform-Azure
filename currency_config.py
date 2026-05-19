@@ -3,7 +3,7 @@
 
 CURRENCIES = {
     'INR': {
-        'symbol': '₹',
+        'symbol': '\u20b9',
         'name': 'Indian Rupee',
         'code': 'INR',
         'locale': 'en-IN',
@@ -17,21 +17,21 @@ CURRENCIES = {
         'decimal_places': 2
     },
     'EUR': {
-        'symbol': '€',
+        'symbol': '\u20ac',
         'name': 'Euro',
         'code': 'EUR',
         'locale': 'de-DE',
         'decimal_places': 2
     },
     'GBP': {
-        'symbol': '£',
+        'symbol': '\u00a3',
         'name': 'British Pound',
         'code': 'GBP',
         'locale': 'en-GB',
         'decimal_places': 2
     },
     'JPY': {
-        'symbol': '¥',
+        'symbol': '\u00a5',
         'name': 'Japanese Yen',
         'code': 'JPY',
         'locale': 'ja-JP',
