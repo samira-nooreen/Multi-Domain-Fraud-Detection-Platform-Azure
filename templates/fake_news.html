@@ -257,8 +257,8 @@
         <li><a href="/">Home</a></li>
         <li><a href="/analytics">Analytics</a></li>
         <li><a href="/security">Security</a></li>
-        <li><a href="#report-fraud">Report</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="/#report-fraud">Report</a></li>
+        <li><a href="/#contact">Contact</a></li>
         <li><a href="/logout">Logout</a></li>
       </ul>
 
@@ -472,11 +472,12 @@
         document.getElementById("recommendation").textContent =
           result.recommendation ||
           (isFake
-            ? "⚠️ WARNING: This article contains fake news indicators. Do not share without verification."
+            ? "âš ï¸ WARNING: This article contains fake news indicators. Do not share without verification."
             : mediumLike
-              ? "⚠️ Potentially misleading information detected. Verify before sharing."
-              : "✅ No action required. Article appears authentic.");
+              ? "âš ï¸ Potentially misleading information detected. Verify before sharing."
+              : "âœ… No action required. Article appears authentic.");
       }
     </script>
   </body>
 </html>
+
