@@ -432,20 +432,20 @@ class BrandAbuseDetector:
             prob = self.model.predict_proba(df)[0][1]
             
             # Determine risk level based on probability
-            if prob > 0.9:
+            if prob > 0.85:
                 risk_level = 'CRITICAL'
-            elif prob > 0.7:
+            elif prob > 0.6:
                 risk_level = 'HIGH'
-            elif prob > 0.4:
+            elif prob > 0.3:
                 risk_level = 'MEDIUM'
             else:
                 risk_level = 'LOW'
             
             return {
-                'is_brand_abuse': bool(prob > 0.5),  # Adjusted threshold
+                'is_brand_abuse': bool(prob > 0.4),
                 'abuse_probability': float(prob),
                 'risk_level': risk_level,
-                'confidence': 0.95,
+                'confidence': 0.95,  # Placeholder confidence
                 'indicators': self._get_social_indicators(data, features),
             }
         except Exception as e:
