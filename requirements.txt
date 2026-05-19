@@ -83,7 +83,7 @@ python-dotenv>=1.0.0
 # Production Server
 gunicorn>=23.0.0
 
-# Optional: OpenTelemetry + Azure Monitor exporter for Application Insights (install only if enabling monitoring)
-opentelemetry-sdk>=1.19.0
-opentelemetry-instrumentation-flask>=0.36b0
-azure-monitor-opentelemetry-exporter==1.0.0b52
+# Optional: install these only when Application Insights tracing is required.
+# opentelemetry-sdk>=1.19.0
+# opentelemetry-instrumentation-flask>=0.36b0
+# azure-monitor-opentelemetry-exporter==1.0.0b52

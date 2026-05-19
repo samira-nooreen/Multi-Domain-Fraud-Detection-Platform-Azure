@@ -9,15 +9,15 @@ venv/
 # Exclude caches and compiled artifacts
 
 **pycache**/
-_.pyc
-_.pyo
-\*.pyd
+*.pyc
+*.pyo
+*.pyd
 
 # Exclude logs and temp outputs
 
 logs/
-_.log
-debug_output_.txt
+*.log
+debug_output*.txt
 dump_output*.txt
 app_startup*.txt
 
@@ -25,19 +25,31 @@ app_startup*.txt
 
 data_backup/
 models_backup/
-_.zip
-_.tar.gz
-\*.7z
+ml_modules/document_forgery/doc_data/
+test_documents/
+*.zip
+*.tar.gz
+*.7z
 
 # Exclude notebooks/check scripts/docs not needed at runtime
 
-check*\*.py
-fix*_.py
-debug\__.py
-demonstrate*\*.py
-create_test*_.py
-_.md
+check_*.py
+debug_*.py
+fix_*.py
+test_*.py
+verify_*.py
+demonstrate_*.py
+create_test_*.py
+trigger_*.py
+view_*.py
+*/train.py
+*/train_*.py
+*/generate_data.py
+*/quick_demo.py
+*.md
+*.csv
+*.npy
 
 # Keep runtime code, templates, static assets, db, and ml model files
 
-# (No broad excludes for .pkl/.db/.csv to avoid removing required files)
+# (No broad excludes for .pkl/.db to avoid removing required model files)

@@ -38,6 +38,7 @@ jobs:
             --exclude '.python_packages/' \
             --exclude '.vscode/' \
             --exclude '__pycache__/' \
+            --exclude '*/__pycache__/' \
             --exclude '*.pyc' \
             --exclude '*.pyo' \
             --exclude '*.pyd' \
@@ -47,23 +48,50 @@ jobs:
             --exclude 'app_startup*.txt' \
             --exclude 'data_backup/' \
             --exclude 'models_backup/' \
+            --exclude 'ml_modules/document_forgery/doc_data/' \
+            --exclude 'test_documents/' \
             --exclude 'logs/' \
             --exclude 'tests/' \
             --exclude 'docs/' \
+            --exclude 'check_*.py' \
+            --exclude 'debug_*.py' \
+            --exclude 'fix_*.py' \
+            --exclude 'test_*.py' \
+            --exclude 'verify_*.py' \
+            --exclude 'demonstrate_*.py' \
+            --exclude 'create_test_*.py' \
+            --exclude 'trigger_*.py' \
+            --exclude 'view_*.py' \
+            --exclude '*/train.py' \
+            --exclude '*/train_*.py' \
+            --exclude '*/generate_data.py' \
+            --exclude '*/quick_demo.py' \
+            --exclude '*.md' \
+            --exclude '*.csv' \
+            --exclude '*.npy' \
+            --exclude '*.log' \
             --exclude '*.zip' \
             --exclude '*.tar.gz' \
             --exclude '*.7z' \
             ./ "$DEPLOY_DIR/"
+          du -sh "$DEPLOY_DIR"
+          test "$(du -sm "$DEPLOY_DIR" | cut -f1)" -lt 250
+
+      - name: Install dependencies for smoke test
+        run: |
           python -m pip install --upgrade pip
-          python -m pip install --target "$DEPLOY_DIR/.python_packages/lib/site-packages" -r requirements.txt
+          python -m pip install -r requirements.txt
 
       - name: Smoke test app import
         env:
-          PYTHONPATH: ${{ github.workspace }}/deploy/.python_packages/lib/site-packages:${{ github.workspace }}/deploy
+          PYTHONPATH: ${{ github.workspace }}/deploy
         run: python -c "import app; print('APP_IMPORT_OK')"
 
       - name: Validate core app files
         run: python -m compileall app.py database.py
+
+      - name: Wait for Azure SCM to settle
+        run: sleep 30
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
