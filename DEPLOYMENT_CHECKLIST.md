@@ -23,8 +23,6 @@
 - [x] `ml_modules/document_forgery/` - Document forgery detection
 - [x] `ml_modules/fake_news/` - Fake news detection
 - [x] `ml_modules/fake_profile/` - Fake profile detection
-- [x] `ml_modules/insurance_fraud/` - Insurance fraud detection
-- [x] `ml_modules/loan_default/` - Loan default prediction
 - [x] `ml_modules/phishing_url/` - Phishing URL detection
 - [x] `ml_modules/spam_email/` - Spam email detection
 - [x] `ml_modules/upi_fraud/` - UPI fraud detection

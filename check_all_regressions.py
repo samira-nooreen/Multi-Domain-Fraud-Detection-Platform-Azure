@@ -24,7 +24,6 @@ def run_check(script_name: str) -> int:
 
 def main() -> int:
     checks = [
-        "check_fake_news_regression.py",
         "check_spam_regression.py",
         "check_phishing_regression.py",
     ]

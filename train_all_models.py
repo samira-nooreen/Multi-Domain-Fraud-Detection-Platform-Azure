@@ -39,54 +39,6 @@ def train_credit_card_fraud():
         print(stderr)
         return False
 
-def train_loan_default():
-    """Train Loan Default Prediction Model"""
-    print("Training Loan Default Prediction Model...")
-    success, stdout, stderr = run_command("python ml_modules/loan_default/train.py")
-    if success:
-        print("✅ Loan Default Prediction Model trained successfully")
-        return True
-    else:
-        print("❌ Failed to train Loan Default Prediction Model")
-        print(stderr)
-        return False
-
-def train_insurance_fraud():
-    """Train Insurance Fraud Detection Model"""
-    print("Training Insurance Fraud Detection Model...")
-    success, stdout, stderr = run_command("python ml_modules/insurance_fraud/train.py")
-    if success:
-        print("✅ Insurance Fraud Detection Model trained successfully")
-        return True
-    else:
-        print("❌ Failed to train Insurance Fraud Detection Model")
-        print(stderr)
-        return False
-
-def train_click_fraud():
-    """Train Click Fraud Detection Model"""
-    print("Training Click Fraud Detection Model...")
-    success, stdout, stderr = run_command("python ml_modules/click_fraud/train.py")
-    if success:
-        print("✅ Click Fraud Detection Model trained successfully")
-        return True
-    else:
-        print("❌ Failed to train Click Fraud Detection Model")
-        print(stderr)
-        return False
-
-def train_fake_news():
-    """Train Fake News Detection Model"""
-    print("Training Fake News Detection Model...")
-    success, stdout, stderr = run_command("python ml_modules/fake_news/train.py")
-    if success:
-        print("✅ Fake News Detection Model trained successfully")
-        return True
-    else:
-        print("❌ Failed to train Fake News Detection Model")
-        print(stderr)
-        return False
-
 def train_spam_email():
     """Train Spam Email Detection Model"""
     print("Training Spam Email Detection Model...")
@@ -123,18 +75,6 @@ def train_fake_profile():
         print(stderr)
         return False
 
-def train_document_forgery():
-    """Train Document Forgery Detection Model"""
-    print("Training Document Forgery Detection Model...")
-    success, stdout, stderr = run_command("python ml_modules/document_forgery/train.py")
-    if success:
-        print("✅ Document Forgery Detection Model trained successfully")
-        return True
-    else:
-        print("❌ Failed to train Document Forgery Detection Model")
-        print(stderr)
-        return False
-
 def main():
     """Main function to train all models"""
     print("FRAUD DETECTION SYSTEM - TRAIN ALL MODELS")
@@ -147,14 +87,9 @@ def main():
     training_functions = [
         ("UPI Fraud Detection", train_upi_fraud),
         ("Credit Card Fraud Detection", train_credit_card_fraud),
-        ("Loan Default Prediction", train_loan_default),
-        ("Insurance Fraud Detection", train_insurance_fraud),
-        ("Click Fraud Detection", train_click_fraud),
-        ("Fake News Detection", train_fake_news),
         ("Spam Email Detection", train_spam_email),
         ("Phishing URL Detection", train_phishing_url),
         ("Fake Profile Detection", train_fake_profile),
-        ("Document Forgery Detection", train_document_forgery)
     ]
     
     successful_trainings = []

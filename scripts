@@ -1,12 +1,12 @@
 @echo off
 echo ================================================================================
-echo   MULTI-DOMAIN FRAUD DETECTION PLATFORM - Training All 10 Models
+echo   MULTI-DOMAIN FRAUD DETECTION PLATFORM - Training All 8 Models
 echo ================================================================================
 echo.
 
 set start_time=%time%
 
-echo [1/10] Training UPI Fraud Detection (XGBoost)...
+echo [1/8] Training UPI Fraud Detection (XGBoost)...
 cd ml_modules\upi_fraud
 python train.py
 if %errorlevel% neq 0 (
@@ -17,7 +17,7 @@ if %errorlevel% neq 0 (
 cd ..\..
 echo.
 
-echo [2/10] Training Credit Card Fraud (Random Forest)...
+echo [2/8] Training Credit Card Fraud (Random Forest)...
 cd ml_modules\credit_card
 python train.py
 if %errorlevel% neq 0 (
@@ -28,29 +28,9 @@ if %errorlevel% neq 0 (
 cd ..\..
 echo.
 
-echo [3/10] Training Loan Default Prediction (LightGBM)...
-cd ml_modules\loan_default
-python train.py
-if %errorlevel% neq 0 (
-    echo [ERROR] Loan Default training failed!
-) else (
-    echo [SUCCESS] Loan Default model trained!
-)
-cd ..\..
-echo.
 
-echo [4/10] Training Insurance Fraud (XGBoost)...
-cd ml_modules\insurance_fraud
-python train.py
-if %errorlevel% neq 0 (
-    echo [ERROR] Insurance Fraud training failed!
-) else (
-    echo [SUCCESS] Insurance Fraud model trained!
-)
-cd ..\..
-echo.
 
-echo [5/10] Training Click Fraud (Isolation Forest)...
+echo [3/8] Training Click Fraud (Isolation Forest)...
 cd ml_modules\click_fraud
 python train.py
 if %errorlevel% neq 0 (
@@ -61,7 +41,7 @@ if %errorlevel% neq 0 (
 cd ..\..
 echo.
 
-echo [6/10] Training Fake News Detection (BERT/DistilBERT)...
+echo [4/8] Training Fake News Detection (BERT/DistilBERT)...
 cd ml_modules\fake_news
 python train.py
 if %errorlevel% neq 0 (
@@ -72,7 +52,7 @@ if %errorlevel% neq 0 (
 cd ..\..
 echo.
 
-echo [7/10] Training Spam Email Detection (Naive Bayes)...
+echo [5/8] Training Spam Email Detection (Naive Bayes)...
 cd ml_modules\spam_email
 python train.py
 if %errorlevel% neq 0 (
@@ -83,7 +63,7 @@ if %errorlevel% neq 0 (
 cd ..\..
 echo.
 
-echo [8/10] Training Phishing URL Detection (Random Forest)...
+echo [6/8] Training Phishing URL Detection (Random Forest)...
 cd ml_modules\phishing_url
 python train.py
 if %errorlevel% neq 0 (
@@ -94,7 +74,7 @@ if %errorlevel% neq 0 (
 cd ..\..
 echo.
 
-echo [9/10] Training Fake Profile Detection (GNN)...
+echo [7/8] Training Fake Profile Detection (GNN)...
 cd ml_modules\fake_profile
 python train.py
 if %errorlevel% neq 0 (
@@ -105,7 +85,7 @@ if %errorlevel% neq 0 (
 cd ..\..
 echo.
 
-echo [10/10] Training Document Forgery Detection (CNN+OCR)...
+echo [8/8] Training Document Forgery Detection (CNN+OCR)...
 cd ml_modules\document_forgery
 python train.py
 if %errorlevel% neq 0 (

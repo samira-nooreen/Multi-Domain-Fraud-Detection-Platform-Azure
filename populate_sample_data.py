@@ -22,8 +22,6 @@ def populate_sample_data():
         'Phishing URL',
         'Fake Profile / Bot Detection',
         'Document Forgery',
-        'Loan Default',
-        'Insurance Fraud',
         'Click Fraud',
         'Fake News Detection',
         'Spam Email'

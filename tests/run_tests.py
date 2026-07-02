@@ -1,65 +1,18 @@
-"""
-Test Script for Fake News and Spam Email Detection
-Tests both modules with sample data
-"""
+"""Smoke test for the active spam email detector."""
 import sys
 import os
 
 # Add root directory to path to allow imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-print("="*70)
-print("🧪 TESTING FAKE NEWS DETECTION MODULE")
-print("="*70)
-
-try:
-    from ml_modules.fake_news.predict import DJDarkCyberFakeNewsDetector
-    
-    # Initialize detector
-    detector = DJDarkCyberFakeNewsDetector(model_dir='ml_modules/fake_news/models')
-    
-    # Test cases
-    test_articles = [
-        {
-            "title": "Real News Example",
-            "content": "Officials report 3.5% increase in economic growth this year. The Federal Reserve announced new policy measures to address inflation concerns."
-        },
-        {
-            "title": "Fake News Example - Floating Continent",
-            "content": "Scientists Discover a Floating Continent in the Middle of the Ocean. A viral social media post falsely claimed that researchers found a floating continent in the Pacific Ocean. No scientific organization has reported anything similar, and experts confirm the image circulating online was digitally edited."
-        },
-        {
-            "title": "Fake News Example - Miracle Cure",
-            "content": "SHOCKING: Lemon Juice Proven to Cure All Cancers Within 48 Hours! Doctors HATE this miracle cure that Big Pharma doesn't want you to know!"
-        }
-    ]
-    
-    for i, article in enumerate(test_articles, 1):
-        print(f"\n{'─'*70}")
-        print(f"📰 Test Case {i}: {article['title']}")
-        print(f"{'─'*70}")
-        
-        # Use analyze_article instead of predict
-        result = detector.analyze_article(title=article['title'], full_text=article['content'])
-        
-        print(f"Classification: {'🚨 FAKE NEWS' if result['is_fake'] else '✅ REAL NEWS'}")
-        print(f"Confidence: {result['confidence']}")
-        print(f"Prediction: {result['prediction']}")
-        print(f"Source Analysis: {result['source_analysis']}")
-
-except Exception as e:
-    print(f"❌ Error testing Fake News module: {e}")
-    import traceback
-    traceback.print_exc()
-
-print("\n" + "="*70)
+print("=" * 70)
 print("📧 TESTING SPAM EMAIL DETECTION MODULE")
-print("="*70)
+print("=" * 70)
 
 try:
     from ml_modules.spam_email.predict import SpamDetector
     
-    spam_detector = SpamDetector(model_dir='ml_modules/spam_email/models')
+    spam_detector = SpamDetector(model_path='ml_modules/spam_email/spam_model.pkl', vec_path='ml_modules/spam_email/spam_vectorizer.pkl')
     
     # Test cases
     test_emails = [
@@ -102,6 +55,6 @@ except Exception as e:
     import traceback
     traceback.print_exc()
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("✅ TESTING COMPLETE")
-print("="*70)
+print("=" * 70)

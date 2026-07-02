@@ -1,585 +1,796 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MDFDP</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+            <li>Suspicious payment requests or abnormal transactions</li>
+      rel="stylesheet"
+            <li>Fraudulent messages, SMS, or phone numbers</li>
+            <li>Suspicious social media profiles</li>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chatbot.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+                placeholder="e.g., Suspicious payment request from..."
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/coming-soon.css') }}"
+    />
+    <script src="{{ url_for('static', filename='js/coming-soon.js') }}"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>MDFDP</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/coming-soon.css') }}">
-  <script src="{{ url_for('static', filename='js/coming-soon.js') }}"></script>
-</head>
+  <body>
+    <nav class="navbar">
+      <a href="/" class="navbar-logo">
+        <div class="shield-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"
+            />
+          </svg>
+        </div>
+        <div class="navbar-logo-text">
+          Multi-Domain Fraud Detection <br />
+          <span style="font-weight: 700">Platform (MDFDP)</span>
+        </div>
+      </a>
 
-<body>
-  <nav class="navbar">
-    <a href="/" class="navbar-logo">
-      <div class="shield-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-        </svg>
-      </div>
-      <div class="navbar-logo-text">
-        Multi-Domain Fraud Detection <br>
-        <span style="font-weight: 700;">Platform (MDFDP)</span>
-      </div>
-    </a>
+      <ul class="navbar-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="/analytics">Analytics</a></li>
+        <li><a href="/security">Security</a></li>
+        <li><a href="/#report-fraud">Report</a></li>
+        <li><a href="/#contact">Contact</a></li>
+        <li><a href="/logout" class="btn-danger">Logout</a></li>
+      </ul>
 
-    <ul class="navbar-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="/analytics">Analytics</a></li>
-      <li><a href="/security">Security</a></li>
-      <li><a href="/#report-fraud">Report</a></li>
-      <li><a href="/#contact">Contact</a></li>
-      <li><a href="/logout" class="btn-danger">Logout</a></li>
-    </ul>
+      <a href="/profile" class="navbar-btn"
+        ><i class="fas fa-user"></i> Profile</a
+      >
+    </nav>
 
-    <a href="/profile" class="navbar-btn"><i class="fas fa-user"></i> Profile</a>
-  </nav>
-
-  <main>
-    {% if suspicious_login %}
-    <div
-      style="background: rgba(255, 111, 0, 0.15); border: 1px solid #ff6f00; color: #ff6f00; padding: 15px 20px; margin: 20px 40px; border-radius: 8px; display: flex; align-items: center; gap: 15px; animation: slideDown 0.5s ease-out;">
-      <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
-      <div>
-        <strong style="display: block; margin-bottom: 4px;">Suspicious Login Detected</strong>
-        <span style="font-size: 0.9rem; opacity: 0.9;">We noticed unusual activity during your recent login.
-          Please
-          review your account security settings.</span>
-      </div>
-      <button onclick="this.parentElement.style.display='none'"
-        style="background: none; border: none; color: #ff6f00; margin-left: auto; cursor: pointer; font-size: 1.2rem;">&times;</button>
-    </div>
-    {% endif %}
-    <section class="hero">
-      <div class="hero-left">
-        <h1>Detecting Fraud,<br />Securing Transactions</h1>
-        <p>
-          Empowering businesses with cutting-edge AI to detect and prevent
-          fraud across multiple domains. Safeguard your assets and build trust
-          with our innovative solutions. Join us!
-        </p>
-        <button class="know-btn" onclick="knowMore()">Know more</button>
-      </div>
-
-      <div class="hero-right">
-        <video class="hero-video" autoplay loop muted playsinline>
-          <source src="/static/video/background.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      </div>
-    </section>
-
-    <!-- Brand Abuse Hero Section -->
-    <section class="brand-abuse-hero">
-      <div class="new-tag">NEW</div>
-      <div class="brand-abuse-content">
-        <h2>Brand Abuse</h2>
-        <p class="subtitle">Unauthorized use of your brand assets to impersonate your brand and scam your customers is
-          fraud. Our AI-powered detection system monitors public digital channels at scale to protect your reputation.
-        </p>
-        <button class="detect-brand-btn" onclick="checkLoginAndRedirect('/detect_brand_abuse')">
-          <i class="fas fa-shield-alt"></i> Detect Brand Abuse
+    <main>
+      {% if suspicious_login %}
+      <div
+                <option>Payment Risk</option>
+                <option>Phishing</option>
+          border: 1px solid #ff6f00;
+                <option>Identity Risk</option>
+          padding: 15px 20px;
+          margin: 20px 40px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          animation: slideDown 0.5s ease-out;
+        "
+      >
+        <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem"></i>
+        <div>
+          <strong style="display: block; margin-bottom: 4px"
+            >Suspicious Login Detected</strong
+          >
+          <span style="font-size: 0.9rem; opacity: 0.9"
+            >We noticed unusual activity during your recent login. Please review
+            your account security settings.</span
+          >
+        </div>
+        <button
+          onclick="this.parentElement.style.display = 'none'"
+          style="
+            background: none;
+            border: none;
+            color: #ff6f00;
+            margin-left: auto;
+            cursor: pointer;
+            font-size: 1.2rem;
+          "
+        >
+          &times;
         </button>
       </div>
-      <div class="brand-abuse-image">
-        <div class="brand-abuse-animation">
-          <div class="shield-outer"></div>
-          <div class="shield-inner">
-            <div class="shield-icon-animated">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-              </svg>
-            </div>
+      {% endif %}
+      <section class="hero">
+        <div class="hero-left">
+          <h1>Detecting Fraud,<br />Securing Transactions</h1>
+          <p>
+            Empowering businesses with cutting-edge AI to detect and prevent
+            fraud across multiple domains. Safeguard your assets and build trust
+            with our innovative solutions. Join us!
+          </p>
+          <div
+            style="
+              display: inline-flex;
+              flex-wrap: wrap;
+              gap: 10px;
+              margin: 0 0 18px;
+              padding: 10px 14px;
+              border: 1px solid rgba(136, 118, 248, 0.35);
+              border-radius: 999px;
+              background: rgba(17, 17, 24, 0.75);
+              color: #d7d2ff;
+              font-size: 0.92rem;
+            "
+          >
+            <span
+              ><i class="fas fa-cloud-upload-alt"></i> Azure App Service
+              ready</span
+            >
+            <span>|</span>
+            <span>GitHub Actions deployment</span>
+            <span>|</span>
+            <span>Heat-map dashboard only</span>
           </div>
-          <div class="scan-ring"></div>
-          <div class="scan-ring"></div>
-          <div class="scan-ring"></div>
+          <button class="know-btn" onclick="knowMore()">Know more</button>
+        </div>
+
+        <div class="hero-right">
+          <video class="hero-video" autoplay loop muted playsinline>
+            <source src="/static/video/background.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </section>
+    </main>
+    <!-- About Section -->
+    <section class="about-section" id="about">
+      <div class="about-container">
+        <div class="about-header">
+          <h2 class="about-title">About Our Platform</h2>
+          <p class="about-subtitle">
+            A real-time fraud monitoring dashboard centered on heat-map analysis
+            and incident tracking.
+          </p>
+        </div>
+
+        <div class="about-features">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <h3>AI-Powered Detection</h3>
+            <p>
+              Advanced machine learning models that adapt to new fraud patterns
+              in real-time.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <h3>Real-Time Analysis</h3>
+            <p>
+              Instant fraud detection with millisecond response times for
+              critical transactions.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <h3>Bank-Grade Security</h3>
+            <p>
+              End-to-end encryption and secure data handling to protect your
+              sensitive information.
+            </p>
+          </div>
         </div>
       </div>
     </section>
-  </main>
-  <!-- About Section -->
-  <section class="about-section" id="about">
-    <div class="about-container">
-      <div class="about-header">
-        <h2 class="about-title">About Our Platform</h2>
-        <p class="about-subtitle">Empowering businesses with cutting-edge AI to detect and prevent fraud across multiple
-          domains</p>
-      </div>
 
-      <div class="about-features">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-brain"></i>
+    <!-- Real-Time Dashboard Section -->
+    <section class="realtime-dashboard">
+      <div class="dashboard-grid">
+        <!-- Interactive Heatmap -->
+        <div class="dashboard-card heatmap">
+          <div class="dashboard-title">
+            Real-Time Fraud Heatmap
+            <span
+              id="last-updated"
+              style="float: right; font-size: 0.8em; color: #aaa"
+            ></span>
           </div>
-          <h3>AI-Powered Detection</h3>
-          <p>Advanced machine learning models that adapt to new fraud patterns in real-time.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-bolt"></i>
-          </div>
-          <h3>Real-Time Analysis</h3>
-          <p>Instant fraud detection with millisecond response times for critical transactions.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-lock"></i>
-          </div>
-          <h3>Bank-Grade Security</h3>
-          <p>End-to-end encryption and secure data handling to protect your sensitive information.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Domain cards section -->
-  <section class="domain-cards">
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-      <div class="card-title">UPI</div>
-      <div class="card-desc">Real-time UPI fraud pattern identification.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_upi')">Detect</button>
-    </div>
-
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-credit-card"></i></div>
-      <div class="card-title">Credit</div>
-      <div class="card-desc">Classify transactions accurately.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_credit')">Detect</button>
-    </div>
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-money-check-dollar"></i></div>
-      <div class="card-title">Loan</div>
-      <div class="card-desc">Predict loan defaults effectively.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_loan')">Detect</button>
-    </div>
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-shield"></i></div>
-      <div class="card-title">Insurance</div>
-      <div class="card-desc">Detect fraudulent claims efficiently.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_insurance')">Detect</button>
-    </div>
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-bullseye"></i></div>
-      <div class="card-title">Click</div>
-      <div class="card-desc">Analyze ad clicks effectively.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_click')">Detect</button>
-    </div>
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-newspaper"></i></div>
-      <div class="card-title">Fake</div>
-      <div class="card-desc">Classify news accurately.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_fake_news')">Detect</button>
-    </div>
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
-      <div class="card-title">Spam</div>
-      <div class="card-desc">Flag phishing emails efficiently.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_spam')">Detect</button>
-    </div>
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-link"></i></div>
-      <div class="card-title">Phishing</div>
-      <div class="card-desc">Detect phishing sites accurately.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_phishing')">Detect</button>
-    </div>
-    <div class="card">
-      <div class="card-icon"><i class="fa-solid fa-robot"></i></div>
-      <div class="card-title">Fake Profile/Bot</div>
-      <div class="card-desc">Detect bots or fake profiles using network and behavior analysis.</div>
-      <button class="detect-btn" onclick="checkLoginAndRedirect('/detect_bot')">Detect</button>
-    </div>
-    <div class="card coming-soon-card">
-      <div class="card-icon"><i class="fa-solid fa-id-badge"></i></div>
-      <div class="card-title">Document Forgery</div>
-      <div class="card-desc">Detect tampered identity cards with OCR and image analysis.</div>
-      <button class="detect-btn coming-soon-btn" onclick="showComingSoonPopup('Document Forgery')" disabled>
-        <i class="fas fa-clock"></i> Coming Soon
-      </button>
-    </div>
-
-
-  </section>
-
-  <!-- Real-Time Dashboard Section -->
-  <section class="realtime-dashboard">
-    <div class="dashboard-grid">
-      <!-- Interactive Heatmap -->
-      <div class="dashboard-card heatmap">
-        <div class="dashboard-title">Real-Time Fraud Heatmap <span id="last-updated"
-            style="float: right; font-size: 0.8em; color: #aaa;"></span></div>
-        <div id="india-map"></div>
-        <div class="dashboard-card top-cities">
-          <div class="dashboard-title">Top Fraud Cities</div>
-          <div class="top-cities-scroll-container">
-            <button class="scroll-btn scroll-up" onclick="scrollCities(-1)">&#9650;</button>
-            <ul class="top-cities-list" id="top-cities-list">
-              <li><span class="dot critical"></span> Mumbai - Critical</li>
-              <li><span class="dot high"></span> Delhi - High</li>
-              <li><span class="dot medium"></span> Bangalore - Medium</li>
-              <li><span class="dot medium"></span> Kolkata - Medium</li>
-              <li><span class="dot low"></span> Chennai - Low</li>
-              <li><span class="dot high"></span> Hyderabad - High</li>
-              <li><span class="dot medium"></span> Pune - Medium</li>
-              <li><span class="dot medium"></span> Ahmedabad - Medium</li>
-              <li><span class="dot low"></span> Jaipur - Low</li>
-              <li><span class="dot high"></span> Lucknow - High</li>
-            </ul>
-            <button class="scroll-btn scroll-down" onclick="scrollCities(1)">&#9660;</button>
+          <div id="india-map"></div>
+          <div class="dashboard-card top-cities">
+            <div class="dashboard-title">Top Fraud Cities</div>
+            <div class="top-cities-scroll-container">
+              <button class="scroll-btn scroll-up" onclick="scrollCities(-1)">
+                &#9650;
+              </button>
+              <ul class="top-cities-list" id="top-cities-list">
+                <li><span class="dot critical"></span> Mumbai - Critical</li>
+                <li><span class="dot high"></span> Delhi - High</li>
+                <li><span class="dot medium"></span> Bangalore - Medium</li>
+                <li><span class="dot medium"></span> Kolkata - Medium</li>
+                <li><span class="dot low"></span> Chennai - Low</li>
+                <li><span class="dot high"></span> Hyderabad - High</li>
+                <li><span class="dot medium"></span> Pune - Medium</li>
+                <li><span class="dot medium"></span> Ahmedabad - Medium</li>
+                <li><span class="dot low"></span> Jaipur - Low</li>
+                <li><span class="dot high"></span> Lucknow - High</li>
+              </ul>
+              <button class="scroll-btn scroll-down" onclick="scrollCities(1)">
+                &#9660;
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Incident Distribution -->
-      <div class="dashboard-card incident">
-        <div class="dashboard-title">Incident Distribution</div>
-        <ul class="incident-list">
-          <li><span class="dot dot-orange"></span>Mumbai <span class="right">456</span> <span
-              class="chip critical">critical</span></li>
-          <li><span class="dot dot-orange"></span>Delhi <span class="right">378</span> <span
-              class="chip high">high</span></li>
-          <li><span class="dot dot-yellow"></span>Bangalore <span class="right">234</span> <span
-              class="chip high">high</span></li>
-          <li><span class="dot dot-yellow"></span>Hyderabad <span class="right">312</span> <span
-              class="chip high">high</span></li>
-        </ul>
-      </div>
-
-      <!-- Fraud Type Distribution -->
-      <div class="dashboard-card distribution">
-        <div class="dashboard-title">Fraud Type Distribution</div>
-        <div class="distribution-tabs">
-          <button class="tab" onclick="updateFraudStats('1h')">1h</button>
-          <button class="tab" onclick="updateFraudStats('6h')">6h</button>
-          <button class="tab active" onclick="updateFraudStats('24h')">24h</button>
-          <button class="tab" onclick="updateFraudStats('7d')">7d</button>
-          <button class="tab" onclick="updateFraudStats('30d')">30d</button>
+        <!-- Incident Distribution -->
+        <div class="dashboard-card incident">
+          <div class="dashboard-title">Incident Distribution</div>
+          <ul class="incident-list">
+            <li>
+              <span class="dot dot-orange"></span>Mumbai
+              <span class="right">456</span>
+              <span class="chip critical">critical</span>
+            </li>
+            <li>
+              <span class="dot dot-orange"></span>Delhi
+              <span class="right">378</span> <span class="chip high">high</span>
+            </li>
+            <li>
+              <span class="dot dot-yellow"></span>Bangalore
+              <span class="right">234</span> <span class="chip high">high</span>
+            </li>
+            <li>
+              <span class="dot dot-yellow"></span>Hyderabad
+              <span class="right">312</span> <span class="chip high">high</span>
+            </li>
+          </ul>
         </div>
-        <div class="distribution-bar" id="fraud-stats">
-          <div><span class="bar pink" style="width:34%"></span>UPI Fraud <span class="value">456 cases
-              34%</span></div>
-          <div><span class="bar orange" style="width:28%"></span>Credit Card <span class="value">378 cases
-              28%</span>
+
+        <!-- Fraud Type Distribution -->
+        <div class="dashboard-card distribution">
+          <div class="dashboard-title">Fraud Type Distribution</div>
+          <div class="distribution-tabs">
+            <button class="tab" onclick="updateFraudStats('1h')">1h</button>
+            <button class="tab" onclick="updateFraudStats('6h')">6h</button>
+            <button class="tab active" onclick="updateFraudStats('24h')">
+              24h
+            </button>
+            <button class="tab" onclick="updateFraudStats('7d')">7d</button>
+            <button class="tab" onclick="updateFraudStats('30d')">30d</button>
           </div>
-          <div><span class="bar purple" style="width:18%"></span>Identity Theft <span class="value">243 cases
-              18%</span>
-          </div>
-          <div><span class="bar blue" style="width:12%"></span>Phishing <span class="value">162 cases
-              12%</span></div>
-          <div><span class="bar gray" style="width:8%"></span>Other <span class="value">108 cases 8%</span>
+          <div class="distribution-bar" id="fraud-stats">
+            <div>
+              <span class="bar pink" style="width: 34%"></span>Transaction Risk
+              <span class="value">456 cases 34%</span>
+            </div>
+            <div>
+              <span class="bar orange" style="width: 28%"></span>Payment Abuse
+              <span class="value">378 cases 28%</span>
+            </div>
+            <div>
+              <span class="bar purple" style="width: 18%"></span>Identity
+              Signals
+              <span class="value">243 cases 18%</span>
+            </div>
+            <div>
+              <span class="bar blue" style="width: 12%"></span>Phishing
+              <span class="value">162 cases 12%</span>
+            </div>
+            <div>
+              <span class="bar gray" style="width: 8%"></span>Other
+              <span class="value">108 cases 8%</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <script>
-        // Fraud statistics data for different time periods
-        const fraudData = {
-          '1h': {
-            'UPI Fraud': { cases: 23, percent: 38 },
-            'Credit Card': { cases: 18, percent: 30 },
-            'Identity Theft': { cases: 10, percent: 17 },
-            'Phishing': { cases: 6, percent: 10 },
-            'Other': { cases: 3, percent: 5 }
-          },
-          '6h': {
-            'UPI Fraud': { cases: 142, percent: 36 },
-            'Credit Card': { cases: 108, percent: 27 },
-            'Identity Theft': { cases: 75, percent: 19 },
-            'Phishing': { cases: 48, percent: 12 },
-            'Other': { cases: 24, percent: 6 }
-          },
-          '24h': {
-            'UPI Fraud': { cases: 456, percent: 34 },
-            'Credit Card': { cases: 378, percent: 28 },
-            'Identity Theft': { cases: 243, percent: 18 },
-            'Phishing': { cases: 162, percent: 12 },
-            'Other': { cases: 108, percent: 8 }
-          },
-          '7d': {
-            'UPI Fraud': { cases: 2845, percent: 32 },
-            'Credit Card': { cases: 2456, percent: 28 },
-            'Identity Theft': { cases: 1678, percent: 19 },
-            'Phishing': { cases: 1234, percent: 14 },
-            'Other': { cases: 678, percent: 7 }
-          },
-          '30d': {
-            'UPI Fraud': { cases: 12456, percent: 33 },
-            'Credit Card': { cases: 10567, percent: 28 },
-            'Identity Theft': { cases: 7890, percent: 21 },
-            'Phishing': { cases: 4567, percent: 12 },
-            'Other': { cases: 2345, percent: 6 }
-          }
-        };
+        <script>
+          // Fraud statistics data for different time periods
+          const fraudData = {
+            "1h": {
+              "Transaction Risk": { cases: 23, percent: 38 },
+              "Payment Abuse": { cases: 18, percent: 30 },
+              "Identity Signals": { cases: 10, percent: 17 },
+              Phishing: { cases: 6, percent: 10 },
+              Other: { cases: 3, percent: 5 },
+            },
+            "6h": {
+              "Transaction Risk": { cases: 142, percent: 36 },
+              "Payment Abuse": { cases: 108, percent: 27 },
+              "Identity Signals": { cases: 75, percent: 19 },
+              Phishing: { cases: 48, percent: 12 },
+              Other: { cases: 24, percent: 6 },
+            },
+            "24h": {
+              "Transaction Risk": { cases: 456, percent: 34 },
+              "Payment Abuse": { cases: 378, percent: 28 },
+              "Identity Signals": { cases: 243, percent: 18 },
+              Phishing: { cases: 162, percent: 12 },
+              Other: { cases: 108, percent: 8 },
+            },
+            "7d": {
+              "Transaction Risk": { cases: 2845, percent: 32 },
+              "Payment Abuse": { cases: 2456, percent: 28 },
+              "Identity Signals": { cases: 1678, percent: 19 },
+              Phishing: { cases: 1234, percent: 14 },
+              Other: { cases: 678, percent: 7 },
+            },
+            "30d": {
+              "Transaction Risk": { cases: 12456, percent: 33 },
+              "Payment Abuse": { cases: 10567, percent: 28 },
+              "Identity Signals": { cases: 7890, percent: 21 },
+              Phishing: { cases: 4567, percent: 12 },
+              Other: { cases: 2345, percent: 6 },
+            },
+          };
 
-        function updateFraudStats(period) {
-          // Update active tab
-          document.querySelectorAll('.distribution-tabs .tab').forEach(tab => {
-            tab.classList.remove('active');
-            if (tab.innerText.toLowerCase() === period) {
-              tab.classList.add('active');
+          function updateFraudStats(period) {
+            // Update active tab
+            document
+              .querySelectorAll(".distribution-tabs .tab")
+              .forEach((tab) => {
+                tab.classList.remove("active");
+                if (tab.innerText.toLowerCase() === period) {
+                  tab.classList.add("active");
+                }
+              });
+
+            // Update stats
+            const data = fraudData[period];
+            const container = document.getElementById("fraud-stats");
+            container.innerHTML = "";
+
+            const colors = ["pink", "orange", "purple", "blue", "gray"];
+            let i = 0;
+
+            for (const [type, stats] of Object.entries(data)) {
+              const div = document.createElement("div");
+              div.innerHTML = `<span class="bar ${colors[i]}" style="width:${stats.percent}%"></span>${type} <span class="value">${stats.cases} cases ${stats.percent}%</span>`;
+              container.appendChild(div);
+              i++;
             }
-          });
-
-          // Update stats
-          const data = fraudData[period];
-          const container = document.getElementById('fraud-stats');
-          container.innerHTML = '';
-
-          const colors = ['pink', 'orange', 'purple', 'blue', 'gray'];
-          let i = 0;
-
-          for (const [type, stats] of Object.entries(data)) {
-            const div = document.createElement('div');
-            div.innerHTML = `<span class="bar ${colors[i]}" style="width:${stats.percent}%"></span>${type} <span class="value">${stats.cases} cases ${stats.percent}%</span>`;
-            container.appendChild(div);
-            i++;
           }
-        }
-      </script>
+        </script>
 
-      <!-- Latest Fraud News -->
-      <div class="dashboard-card news">
-        <div class="dashboard-title">Latest Fraud Trends & News <button onclick="fetchNews()"
-            style="float:right; border:none; background:none; color:#ff4d4d; cursor:pointer;"><i
-              class="fas fa-sync-alt"></i></button></div>
-        <div class="news-scroll-container" id="news-container">
-          <div style="text-align:center; padding:20px; color:#666;">
-            <i class="fas fa-circle-notch fa-spin"></i> Loading real-time news...
+        <!-- Latest Fraud News -->
+        <div class="dashboard-card news">
+          <div class="dashboard-title">
+            Latest Fraud Trends & News
+            <button
+              onclick="fetchNews()"
+              style="
+                float: right;
+                border: none;
+                background: none;
+                color: #ff4d4d;
+                cursor: pointer;
+              "
+            >
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+          <div class="news-scroll-container" id="news-container">
+            <div style="text-align: center; padding: 20px; color: #666">
+              <i class="fas fa-circle-notch fa-spin"></i> Loading real-time
+              news...
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <script>
-    function fetchNews() {
-      const container = document.getElementById('news-container');
-      container.innerHTML = '<div style="text-align:center; padding:20px; color:#666;"><i class="fas fa-circle-notch fa-spin"></i> Refreshing news...</div>';
+    <script>
+      function fetchNews() {
+        const container = document.getElementById("news-container");
+        container.innerHTML =
+          '<div style="text-align:center; padding:20px; color:#666;"><i class="fas fa-circle-notch fa-spin"></i> Refreshing news...</div>';
 
-      fetch('/api/news?limit=10')
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'success') {
-            container.innerHTML = '';
-            data.news.forEach(item => {
-              const newsItem = document.createElement('div');
-              newsItem.className = 'news-item';
+        fetch("/api/news?limit=10")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              container.innerHTML = "";
+              data.news.forEach((item) => {
+                const newsItem = document.createElement("div");
+                newsItem.className = "news-item";
 
-              // Create tags HTML
-              const tagsHtml = item.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                // Create tags HTML
+                const tagsHtml = item.tags
+                  .map((tag) => `<span class="tag">${tag}</span>`)
+                  .join("");
 
-              newsItem.innerHTML = `
+                newsItem.innerHTML = `
                 <div class="news-date">${item.date}</div>
                 <h3 class="news-heading">${item.heading}</h3>
                 <p class="news-summary">${item.summary}</p>
                 <div class="news-tags">${tagsHtml}</div>
               `;
 
-              container.appendChild(newsItem);
-            });
-          } else {
-            container.innerHTML = '<div style="text-align:center; color:red;">Failed to load news.</div>';
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching news:', error);
-          container.innerHTML = '<div style="text-align:center; color:red;">News service unavailable.</div>';
-        });
-    }
+                container.appendChild(newsItem);
+              });
+            } else {
+              container.innerHTML =
+                '<div style="text-align:center; color:red;">Failed to load news.</div>';
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching news:", error);
+            container.innerHTML =
+              '<div style="text-align:center; color:red;">News service unavailable.</div>';
+          });
+      }
 
-    // Fetch news on load
-    document.addEventListener('DOMContentLoaded', fetchNews);
+      // Fetch news on load
+      document.addEventListener("DOMContentLoaded", fetchNews);
 
-    // Auto-refresh news every 5 minutes
-    setInterval(fetchNews, 300000);
-  </script>
+      // Auto-refresh news every 5 minutes
+      setInterval(fetchNews, 300000);
+    </script>
 
+    <!-- Report Fraud Section -->
+    <section
+      id="report-fraud"
+      style="padding: 40px 20px; background: #0d0d0f; margin-top: 40px"
+    >
+      <div style="max-width: 800px; margin: 0 auto; text-align: center">
+        <h2
+          style="
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff4d4d 0%, #ff9999 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+          "
+        >
+          Report Suspicious Activity
+        </h2>
+        <p style="color: #b7b3c9; margin-bottom: 30px; font-size: 1.1rem">
+          Help us make the digital world safer. If you've encountered a
+          potential fraud attempt, report it here. Our AI will analyze it
+          instantly.
+        </p>
 
+        <div
+          style="
+            background: #14141b;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            text-align: left;
+          "
+        >
+          <h3 style="color: #ff4d4d; margin-bottom: 15px; font-size: 1.3rem">
+            What You Can Report:
+          </h3>
+          <ul
+            style="
+              color: #e6e6e6;
+              margin-bottom: 25px;
+              list-style-position: inside;
+              line-height: 1.6;
+            "
+          >
+            <li>Suspicious UPI IDs or payment requests</li>
+            <li>Phishing URLs or fake websites</li>
+            <li>Fraudulent phone numbers or SMS</li>
+            <li>Fake social media profiles</li>
+          </ul>
 
-  <!-- Report Fraud Section -->
-  <section id="report-fraud" style="padding: 40px 20px; background: #0d0d0f; margin-top: 40px;">
-    <div style="max-width: 800px; margin: 0 auto; text-align: center;">
-      <h2
-        style="font-size: 2.5rem; margin-bottom: 20px; background: linear-gradient(135deg, #ff4d4d 0%, #ff9999 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-        Report Suspicious Activity</h2>
-      <p style="color: #b7b3c9; margin-bottom: 30px; font-size: 1.1rem;">
-        Help us make the digital world safer. If you've encountered a potential fraud attempt, report it here.
-        Our AI will analyze it instantly.
-      </p>
+          <form id="report-form" onsubmit="handleReport(event)">
+            <div style="margin-bottom: 15px">
+              <label
+                style="
+                  color: #ff4d4d;
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                "
+                >Title or Subject</label
+              >
+              <input
+                type="text"
+                placeholder="e.g., Fake UPI Request from..."
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #0d0d0f;
+                  border: 1px solid #2a2a35;
+                  color: white;
+                  border-radius: 8px;
+                "
+              />
+            </div>
 
-      <div
-        style="background: #14141b; padding: 30px; border-radius: 16px; border: 1px solid rgba(255, 77, 77, 0.2); text-align: left;">
-        <h3 style="color: #ff4d4d; margin-bottom: 15px; font-size: 1.3rem;">What You Can Report:</h3>
-        <ul style="color: #e6e6e6; margin-bottom: 25px; list-style-position: inside; line-height: 1.6;">
-          <li>Suspicious UPI IDs or payment requests</li>
-          <li>Phishing URLs or fake websites</li>
-          <li>Fraudulent phone numbers or SMS</li>
-          <li>Fake social media profiles</li>
-        </ul>
+            <div style="margin-bottom: 15px">
+              <label
+                style="
+                  color: #ff4d4d;
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                "
+                >Description *</label
+              >
+              <textarea
+                placeholder="Describe what happened..."
+                required
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #0d0d0f;
+                  border: 1px solid #2a2a35;
+                  color: white;
+                  border-radius: 8px;
+                  min-height: 100px;
+                "
+              ></textarea>
+            </div>
 
-        <form id="report-form" onsubmit="handleReport(event)">
-          <div style="margin-bottom: 15px;">
-            <label style="color: #ff4d4d; display: block; margin-bottom: 8px; font-weight: 600;">Title or
-              Subject</label>
-            <input type="text" placeholder="e.g., Fake UPI Request from..."
-              style="width: 100%; padding: 12px; background: #0d0d0f; border: 1px solid #2a2a35; color: white; border-radius: 8px;">
+            <div style="margin-bottom: 15px">
+              <label
+                style="
+                  color: #ff4d4d;
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                "
+                >Source (URL, Phone, ID)</label
+              >
+              <input
+                type="text"
+                placeholder="e.g., 9876543210 or example.com"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #0d0d0f;
+                  border: 1px solid #2a2a35;
+                  color: white;
+                  border-radius: 8px;
+                "
+              />
+            </div>
+
+            <div style="margin-bottom: 20px">
+              <label
+                style="
+                  color: #ff4d4d;
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                "
+                >Category</label
+              >
+              <select
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #0d0d0f;
+                  border: 1px solid #2a2a35;
+                  color: white;
+                  border-radius: 8px;
+                "
+              >
+                <option>Payment Risk</option>
+                <option>Phishing</option>
+                <option>Identity Risk</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom: 20px">
+              <label
+                style="
+                  color: #ff4d4d;
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                "
+                >Supporting Evidence</label
+              >
+              <input type="file" style="color: #b7b3c9" />
+            </div>
+
+            <button
+              type="submit"
+              class="report-btn"
+              style="
+                background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%);
+                color: white;
+                padding: 15px 30px;
+                border: none;
+                border-radius: 8px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s;
+                margin-top: 10px;
+              "
+            >
+              Submit Report
+            </button>
+          </form>
+
+          <div
+            id="report-success"
+            style="
+              display: none;
+              margin-top: 20px;
+              padding: 15px;
+              background: rgba(255, 77, 77, 0.1);
+              border: 1px solid #ff4d4d;
+              border-radius: 8px;
+              color: #ff4d4d;
+            "
+          >
+            <h4 style="color: #ff4d4d; margin-bottom: 15px">
+              Analysis Result:
+            </h4>
+            <p><strong>Risk Score:</strong> High (87/100)</p>
+            <p>
+              <strong>Action Taken:</strong> Flagged for manual review. Similar
+              patterns detected in 12 other reports.
+            </p>
           </div>
+        </div>
 
-          <div style="margin-bottom: 15px;">
-            <label style="color: #ff4d4d; display: block; margin-bottom: 8px; font-weight: 600;">Description
-              *</label>
-            <textarea placeholder="Describe what happened..." required
-              style="width: 100%; padding: 12px; background: #0d0d0f; border: 1px solid #2a2a35; color: white; border-radius: 8px; min-height: 100px;"></textarea>
+        <div style="margin-top: 40px; text-align: left">
+          <h3 style="color: #ff4d4d; margin-bottom: 15px; font-size: 1.3rem">
+            What Happens Next:
+          </h3>
+          <div style="display: flex; gap: 20px; flex-wrap: wrap">
+            <div
+              style="
+                flex: 1;
+                min-width: 200px;
+                background: #14141b;
+                padding: 20px;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+              "
+            >
+              <div
+                style="color: #ff4d4d; font-size: 1.5rem; margin-bottom: 10px"
+              >
+                1. AI Analysis
+              </div>
+              <p style="color: #b7b3c9; font-size: 0.9rem">
+                Our ML models instantly analyze the report for known fraud
+                patterns.
+              </p>
+            </div>
+            <div
+              style="
+                flex: 1;
+                min-width: 200px;
+                background: #14141b;
+                padding: 20px;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+              "
+            >
+              <div
+                style="color: #ff4d4d; font-size: 1.5rem; margin-bottom: 10px"
+              >
+                2. Verification
+              </div>
+              <p style="color: #b7b3c9; font-size: 0.9rem">
+                High-risk reports are verified by our security team.
+              </p>
+            </div>
+            <div
+              style="
+                flex: 1;
+                min-width: 200px;
+                background: #14141b;
+                padding: 20px;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+              "
+            >
+              <div
+                style="color: #ff4d4d; font-size: 1.5rem; margin-bottom: 10px"
+              >
+                3. Action
+              </div>
+              <p style="color: #b7b3c9; font-size: 0.9rem">
+                Valid threats are blocked and shared with authorities.
+              </p>
+            </div>
           </div>
-
-          <div style="margin-bottom: 15px;">
-            <label style="color: #ff4d4d; display: block; margin-bottom: 8px; font-weight: 600;">Source
-              (URL, Phone, ID)</label>
-            <input type="text" placeholder="e.g., 9876543210 or example.com"
-              style="width: 100%; padding: 12px; background: #0d0d0f; border: 1px solid #2a2a35; color: white; border-radius: 8px;">
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <label style="color: #ff4d4d; display: block; margin-bottom: 8px; font-weight: 600;">Category</label>
-            <select
-              style="width: 100%; padding: 12px; background: #0d0d0f; border: 1px solid #2a2a35; color: white; border-radius: 8px;">
-              <option>UPI Fraud</option>
-              <option>Phishing</option>
-              <option>Identity Theft</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <label style="color: #ff4d4d; display: block; margin-bottom: 8px; font-weight: 600;">Supporting
-              Evidence</label>
-            <input type="file" style="color: #b7b3c9;">
-          </div>
-
-          <button type="submit" class="report-btn"
-            style="background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%); color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s; margin-top: 10px;">
-            Submit Report
-          </button>
-        </form>
-
-        <div id="report-success"
-          style="display: none; margin-top: 20px; padding: 15px; background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; border-radius: 8px; color: #ff4d4d;">
-          <h4 style="color: #ff4d4d; margin-bottom: 15px;">Analysis Result:</h4>
-          <p><strong>Risk Score:</strong> High (87/100)</p>
-          <p><strong>Action Taken:</strong> Flagged for manual review. Similar patterns detected in 12 other
-            reports.
-          </p>
         </div>
       </div>
+    </section>
 
-      <div style="margin-top: 40px; text-align: left;">
-        <h3 style="color: #ff4d4d; margin-bottom: 15px; font-size: 1.3rem;">What Happens Next:</h3>
-        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-          <div
-            style="flex: 1; min-width: 200px; background: #14141b; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-            <div style="color: #ff4d4d; font-size: 1.5rem; margin-bottom: 10px;">1. AI Analysis</div>
-            <p style="color: #b7b3c9; font-size: 0.9rem;">Our ML models instantly analyze the report for
-              known fraud patterns.</p>
-          </div>
-          <div
-            style="flex: 1; min-width: 200px; background: #14141b; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-            <div style="color: #ff4d4d; font-size: 1.5rem; margin-bottom: 10px;">2. Verification</div>
-            <p style="color: #b7b3c9; font-size: 0.9rem;">High-risk reports are verified by our security
-              team.</p>
-          </div>
-          <div
-            style="flex: 1; min-width: 200px; background: #14141b; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-            <div style="color: #ff4d4d; font-size: 1.5rem; margin-bottom: 10px;">3. Action</div>
-            <p style="color: #b7b3c9; font-size: 0.9rem;">Valid threats are blocked and shared with
-              authorities.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <script>
+      async function handleReport(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector("button");
+        const originalText = btn.innerText;
 
-  <script>
-    async function handleReport(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('button');
-      const originalText = btn.innerText;
+        btn.innerText = "Submitting...";
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
 
-      btn.innerText = 'Submitting...';
-      btn.disabled = true;
-      btn.style.opacity = '0.7';
+        try {
+          // Get form data
+          const formData = new FormData(e.target);
 
-      try {
-        // Get form data
-        const formData = new FormData(e.target);
-        
-        // Send to backend
-        const response = await fetch('/submit_report', {
-          method: 'POST',
-          body: formData,
-          credentials: 'same-origin',  // Include session cookies
-          redirect: 'manual'  // Don't follow redirects automatically
-        });
-        
-        // Check if response is JSON before parsing
-        const contentType = response.headers.get('content-type');
-        
-        // Handle redirects (302 means not logged in)
-        if (response.status === 302 || response.redirected) {
-          console.warn('Redirect detected - user not logged in');
-          btn.innerText = originalText;
-          btn.disabled = false;
-          btn.style.opacity = '1';
-          alert('Please log in to submit reports. Redirecting to login page...');
-          window.location.href = '/login';
-          return;
-        }
-        
-        if (!contentType || !contentType.includes('application/json')) {
-          // Response is not JSON (likely HTML error page)
-          const text = await response.text();
-          console.error('Non-JSON response:', text.substring(0, 200));
-          
-          btn.innerText = originalText;
-          btn.disabled = false;
-          btn.style.opacity = '1';
-          
-          if (response.status === 401 || text.includes('Login') || text.includes('login')) {
-            alert('Please log in to submit reports. Redirecting to login page...');
-            window.location.href = '/login';
-          } else {
-            alert('Server error. Please try again later.');
+          // Send to backend
+          const response = await fetch("/submit_report", {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin", // Include session cookies
+            redirect: "manual", // Don't follow redirects automatically
+          });
+
+          // Check if response is JSON before parsing
+          const contentType = response.headers.get("content-type");
+
+          // Handle redirects (302 means not logged in)
+          if (response.status === 302 || response.redirected) {
+            console.warn("Redirect detected - user not logged in");
+            btn.innerText = originalText;
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            alert(
+              "Please log in to submit reports. Redirecting to login page...",
+            );
+            window.location.href = "/login";
+            return;
           }
-          return;
-        }
-        
-        const result = await response.json();
-        
-        btn.innerText = originalText;
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        
-        if (result.status === 'success') {
-          document.getElementById('report-success').style.display = 'block';
-          document.getElementById('report-form').reset();
-          
-          // Get AI analysis data
-          const aiAnalysis = result.ai_analysis || {};
-          const patterns = aiAnalysis.patterns || [];
-          
-          // Update success message with AI analysis
-          const successMsg = document.getElementById('report-success');
-          successMsg.innerHTML = `
+
+          if (!contentType || !contentType.includes("application/json")) {
+            // Response is not JSON (likely HTML error page)
+            const text = await response.text();
+            console.error("Non-JSON response:", text.substring(0, 200));
+
+            btn.innerText = originalText;
+            btn.disabled = false;
+            btn.style.opacity = "1";
+
+            if (
+              response.status === 401 ||
+              text.includes("Login") ||
+              text.includes("login")
+            ) {
+              alert(
+                "Please log in to submit reports. Redirecting to login page...",
+              );
+              window.location.href = "/login";
+            } else {
+              alert("Server error. Please try again later.");
+            }
+            return;
+          }
+
+          const result = await response.json();
+
+          btn.innerText = originalText;
+          btn.disabled = false;
+          btn.style.opacity = "1";
+
+          if (result.status === "success") {
+            document.getElementById("report-success").style.display = "block";
+            document.getElementById("report-form").reset();
+
+            // Get AI analysis data
+            const aiAnalysis = result.ai_analysis || {};
+            const patterns = aiAnalysis.patterns || [];
+
+            // Update success message with AI analysis
+            const successMsg = document.getElementById("report-success");
+            successMsg.innerHTML = `
             <div class="success-message">
               <i class="fas fa-check-circle"></i>
               <h3>Report Submitted Successfully!</h3>
@@ -587,333 +798,373 @@
               
               <div style="background: rgba(136, 118, 248, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #8876f8;">
                 <h4 style="color: #8876f8; margin-bottom: 10px;"><i class="fas fa-robot"></i> AI Analysis Complete</h4>
-                <p><strong>Risk Score:</strong> ${aiAnalysis.risk_score || 'Pending'}</p>
-                <p><strong>Confidence:</strong> ${aiAnalysis.confidence || 'N/A'}</p>
+                <p><strong>Risk Score:</strong> ${aiAnalysis.risk_score || "Pending"}</p>
+                <p><strong>Confidence:</strong> ${aiAnalysis.confidence || "N/A"}</p>
                 <p><strong>Detected Patterns:</strong></p>
                 <ul style="margin: 10px 0; padding-left: 20px;">
-                  ${patterns.map(p => `<li>${p}</li>`).join('')}
+                  ${patterns.map((p) => `<li>${p}</li>`).join("")}
                 </ul>
-                <p><strong>Recommendation:</strong> ${aiAnalysis.recommendation || 'Under review'}</p>
+                <p><strong>Recommendation:</strong> ${aiAnalysis.recommendation || "Under review"}</p>
               </div>
             </div>
           `;
-          
-          // Scroll to result
-          successMsg.scrollIntoView({ behavior: 'smooth' });
-        } else {
-          alert('Error: ' + (result.message || 'Unknown error occurred'));
+
+            // Scroll to result
+            successMsg.scrollIntoView({ behavior: "smooth" });
+          } else {
+            alert("Error: " + (result.message || "Unknown error occurred"));
+          }
+        } catch (error) {
+          btn.innerText = originalText;
+          btn.disabled = false;
+          btn.style.opacity = "1";
+          console.error("Report submission error:", error);
+          alert(
+            "Error submitting report. Please make sure you are logged in and try again.",
+          );
         }
-      } catch (error) {
-        btn.innerText = originalText;
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        console.error('Report submission error:', error);
-        alert('Error submitting report. Please make sure you are logged in and try again.');
       }
-    }
-  </script>
+    </script>
 
-  <!-- Chatbot Integration -->
-  <div class="chatbot-container">
-    <div class="chatbot-toggle" id="chatbot-toggle">
-      <i class="fas fa-robot"></i>
-    </div>
-    <div class="chatbot-window" id="chatbot-window">
-      <div class="chatbot-header">
-        <div class="chatbot-title">
-          <i class="fas fa-shield-alt"></i> Security Assistant
+    <!-- Chatbot Integration -->
+    <div class="chatbot-container">
+      <div class="chatbot-toggle" id="chatbot-toggle">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="chatbot-window" id="chatbot-window">
+        <div class="chatbot-header">
+          <div class="chatbot-title">
+            <i class="fas fa-shield-alt"></i> Security Assistant
+          </div>
+          <button class="chatbot-close" id="chatbot-close">&times;</button>
         </div>
-        <button class="chatbot-close" id="chatbot-close">&times;</button>
-      </div>
-      <div class="chatbot-messages" id="chatbot-messages">
-      </div>
-      <div class="chatbot-input-area">
-        <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Type your message...">
-        <button class="chatbot-send" id="chatbot-send"><i class="fas fa-paper-plane"></i></button>
+        <div class="chatbot-messages" id="chatbot-messages"></div>
+        <div class="chatbot-input-area">
+          <input
+            type="text"
+            class="chatbot-input"
+            id="chatbot-input"
+            placeholder="Type your message..."
+          />
+          <button class="chatbot-send" id="chatbot-send">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
-  <script>
-    // Initialize FAQ accordion and map when page loads
-    document.addEventListener('DOMContentLoaded', function () {
-      // Initialize FAQ accordion
-      const faqItems = document.querySelectorAll('.faq-item');
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+    <script>
+      // Initialize FAQ accordion and map when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize FAQ accordion
+        const faqItems = document.querySelectorAll(".faq-item");
 
-      faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
+        faqItems.forEach((item) => {
+          const question = item.querySelector(".faq-question");
 
-        question.addEventListener('click', () => {
-          // Close all other items
-          faqItems.forEach(otherItem => {
-            if (otherItem !== item && otherItem.classList.contains('active')) {
-              otherItem.classList.remove('active');
-            }
+          question.addEventListener("click", () => {
+            // Close all other items
+            faqItems.forEach((otherItem) => {
+              if (
+                otherItem !== item &&
+                otherItem.classList.contains("active")
+              ) {
+                otherItem.classList.remove("active");
+              }
+            });
+
+            // Toggle current item
+            item.classList.toggle("active");
           });
-
-          // Toggle current item
-          item.classList.toggle('active');
         });
       });
-    });
 
-    // Initialize map when page loads
-    document.addEventListener('DOMContentLoaded', function () {
-      const mapContainer = document.getElementById('india-map');
-      if (mapContainer) {
-        // Ensure the map container has the correct size
-        mapContainer.style.height = '500px';
+      // Initialize map when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        const mapContainer = document.getElementById("india-map");
+        if (mapContainer) {
+          // Ensure the map container has the correct size
+          mapContainer.style.height = "500px";
 
-        const map = L.map('india-map').setView([20.5937, 78.9629], 5);
+          const map = L.map("india-map").setView([20.5937, 78.9629], 5);
 
-        // Add ESRI World Imagery tile layer
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-          maxZoom: 19
-        }).addTo(map);
+          // Add ESRI World Imagery tile layer
+          L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            {
+              attribution:
+                "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+              maxZoom: 19,
+            },
+          ).addTo(map);
 
-        // Add reference layer for boundaries and place names
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 19,
-          opacity: 0.7
-        }).addTo(map);
+          // Add reference layer for boundaries and place names
+          L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+            {
+              maxZoom: 19,
+              opacity: 0.7,
+            },
+          ).addTo(map);
 
-        // Color mapping for risk levels
-        const colors = { critical: '#ff0000', high: '#ff6f00', medium: '#ffeb3b', low: '#4caf50' };
+          // Color mapping for risk levels
+          const colors = {
+            critical: "#ff0000",
+            high: "#ff6f00",
+            medium: "#ffeb3b",
+            low: "#4caf50",
+          };
 
-        // Store map markers for real-time updates
-        let fraudMarkers = [];
+          // Store map markers for real-time updates
+          let fraudMarkers = [];
 
-        // Function to update map with new fraud data
-        function updateMapWithFraudData(hotspots) {
-          // Clear existing markers
-          fraudMarkers.forEach(marker => map.removeLayer(marker));
-          fraudMarkers = [];
+          // Function to update map with new fraud data
+          function updateMapWithFraudData(hotspots) {
+            // Clear existing markers
+            fraudMarkers.forEach((marker) => map.removeLayer(marker));
+            fraudMarkers = [];
 
-          // Add new markers
-          hotspots.forEach(h => {
-            // Use consistent circle size for all markers
-            const marker = L.circleMarker(h.coords, {
-              radius: 10,  // Consistent size for all markers
-              fillColor: colors[h.level],
-              color: "#fff",
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.8
-            }).addTo(map).bindPopup(`<b>${h.city}${h.country ? ' (' + h.country + ')' : ''}</b><br>Risk: ${h.level.toUpperCase()}<br>Cases: ${h.cases}`);
+            // Add new markers
+            hotspots.forEach((h) => {
+              // Use consistent circle size for all markers
+              const marker = L.circleMarker(h.coords, {
+                radius: 10, // Consistent size for all markers
+                fillColor: colors[h.level],
+                color: "#fff",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8,
+              })
+                .addTo(map)
+                .bindPopup(
+                  `<b>${h.city}${h.country ? " (" + h.country + ")" : ""}</b><br>Risk: ${h.level.toUpperCase()}<br>Cases: ${h.cases}`,
+                );
 
-            fraudMarkers.push(marker);
-          });
-        }
+              fraudMarkers.push(marker);
+            });
+          }
 
-        // Fetch initial fraud data
-        fetch('/api/fraud-data')
-          .then(response => response.json())
-          .then(data => {
-            if (data.status === 'success') {
+          // Fetch initial fraud data
+          fetch("/api/fraud-data")
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === "success") {
+                updateMapWithFraudData(data.hotspots);
+
+                // Update last updated timestamp
+                const lastUpdatedElement =
+                  document.getElementById("last-updated");
+                if (lastUpdatedElement) {
+                  const date = new Date(data.last_updated);
+                  lastUpdatedElement.textContent = date.toLocaleTimeString();
+                }
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching fraud data:", error);
+            });
+
+          // Initialize Socket.IO connection for real-time updates
+          const socket = io();
+
+          // Listen for real-time fraud updates
+          socket.on("fraud_update", function (data) {
+            if (data.hotspots) {
               updateMapWithFraudData(data.hotspots);
 
               // Update last updated timestamp
-              const lastUpdatedElement = document.getElementById('last-updated');
+              const lastUpdatedElement =
+                document.getElementById("last-updated");
               if (lastUpdatedElement) {
-                const date = new Date(data.last_updated);
+                const date = new Date();
                 lastUpdatedElement.textContent = date.toLocaleTimeString();
               }
             }
-          })
-          .catch(error => {
-            console.error('Error fetching fraud data:', error);
           });
 
-        // Initialize Socket.IO connection for real-time updates
-        const socket = io();
-
-        // Listen for real-time fraud updates
-        socket.on('fraud_update', function (data) {
-          if (data.hotspots) {
-            updateMapWithFraudData(data.hotspots);
-
-            // Update last updated timestamp
-            const lastUpdatedElement = document.getElementById('last-updated');
-            if (lastUpdatedElement) {
-              const date = new Date();
-              lastUpdatedElement.textContent = date.toLocaleTimeString();
-            }
+          // Function to scroll the Top Fraud Cities list
+          function scrollCities(direction) {
+            const container = document.getElementById("top-cities-list");
+            const scrollAmount = 100;
+            container.scrollBy({
+              top: direction * scrollAmount,
+              behavior: "smooth",
+            });
           }
-        });
 
-        // Function to scroll the Top Fraud Cities list
-        function scrollCities(direction) {
-          const container = document.getElementById('top-cities-list');
-          const scrollAmount = 100;
-          container.scrollBy({
-            top: direction * scrollAmount,
-            behavior: 'smooth'
-          });
-        }
-
-        // Fix for map not displaying properly
-        setTimeout(function () {
-          map.invalidateSize();
-        }, 100);
-      }
-    });
-  </script>
-
-  <!-- FAQ Section -->
-  <section class="faq-section">
-    <div class="faq-container">
-      <h2 class="faq-title">Frequently Asked Questions</h2>
-      <p class="faq-subtitle">Find answers to common questions about our fraud detection platform</p>
-
-      <div class="faq-grid">
-        <div class="faq-item">
-          <div class="faq-question">
-            <h3>What types of fraud can your platform detect?</h3>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            <p>Our platform detects various types of fraud including UPI fraud, credit card fraud, loan defaults,
-              insurance fraud, click fraud, fake news, spam emails, phishing URLs, fake profiles/bots, and document
-              forgery. We use advanced machine learning algorithms tailored to each domain.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <h3>How accurate are your fraud detection models?</h3>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            <p>Our models achieve industry-leading accuracy rates, typically above 95% for most fraud types. We
-              continuously retrain our models with new data to maintain and improve performance. Accuracy varies by
-              fraud type and data quality.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <h3>How quickly can I get results from your system?</h3>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            <p>Most fraud detection analyses are completed in real-time, typically within milliseconds. For complex
-              analyses like document forgery, results are usually available within seconds. Our system is designed for
-              high throughput with low latency.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <h3>Is my data secure when using your platform?</h3>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            <p>Absolutely. We implement bank-level security measures including end-to-end encryption, secure data
-              storage, and strict access controls. All data is processed in secure environments and never shared with
-              third parties without explicit consent.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <h3>Can I integrate your solution with my existing systems?</h3>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            <p>Yes, our platform offers robust APIs and SDKs for easy integration with existing systems. We support
-              various integration methods including REST APIs, webhooks, and direct database connections. Our team
-              provides full support during the integration process.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <h3>How often do you update your fraud detection models?</h3>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            <p>We update our models regularly based on new fraud patterns and emerging threats. Critical updates are
-              deployed immediately, while major model retraining occurs monthly. We also provide real-time adaptive
-              learning capabilities for some modules.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>Multi-Domain Fraud Detection Platform</h3>
-        <p>Empowering businesses with cutting-edge AI to detect and prevent fraud across multiple domains.</p>
-        <div class="social-links">
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-linkedin"></i></a>
-          <a href="#"><i class="fab fa-github"></i></a>
-        </div>
-      </div>
-
-      <div class="footer-section">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="/analytics">Analytics</a></li>
-          <li><a href="/security">Security</a></li>
-          <li><a href="/#report-fraud">Report Fraud</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-section">
-        <h4>Detection Modules</h4>
-        <ul>
-          <li><a href="/detect_upi">UPI Fraud</a></li>
-          <li><a href="/detect_credit">Credit Card</a></li>
-          <li><a href="/detect_loan">Loan Default</a></li>
-          <li><a href="/detect_insurance">Insurance</a></li>
-          <li><a href="/detect_click">Click Fraud</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-section" id="contact">
-        <h4>Contact Us</h4>
-        <ul>
-          <li><i class="fas fa-envelope"></i> support@mdfdp.com</li>
-          <li><i class="fas fa-phone"></i> +91 xxxxx xxxxx</li>
-          <li><i class="fas fa-map-marker-alt"></i> Hyderabad, India</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>&copy; 2025 Multi-Domain Fraud Detection Platform. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <!-- Smooth scrolling for anchor links -->
-  <script>
-    // Enable smooth scrolling for all anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') return; // Skip empty links
-        
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-          e.preventDefault();
-          targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+          // Fix for map not displaying properly
+          setTimeout(function () {
+            map.invalidateSize();
+          }, 100);
         }
       });
-    });
-  </script>
-</body>
+    </script>
 
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <div class="faq-container">
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+        <p class="faq-subtitle">
+          Find answers to common questions about our fraud detection platform
+        </p>
+
+        <div class="faq-grid">
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>What types of fraud can your platform detect?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                Our platform detects transaction risk, payment abuse, spam
+                emails, phishing URLs, and suspicious profile behavior. We use
+                advanced machine learning algorithms tailored to each workflow.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>How accurate are your fraud detection models?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                Our models achieve industry-leading accuracy rates, typically
+                above 95% for most fraud types. We continuously retrain our
+                models with new data to maintain and improve performance.
+                Accuracy varies by fraud type and data quality.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>How quickly can I get results from your system?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                Most fraud detection analyses are completed in real-time,
+                typically within milliseconds. Our system is designed for high
+                throughput with low latency.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>Is my data secure when using your platform?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                Absolutely. We implement bank-level security measures including
+                end-to-end encryption, secure data storage, and strict access
+                controls. All data is processed in secure environments and never
+                shared with third parties without explicit consent.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>Can I integrate your solution with my existing systems?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                Yes, our platform offers robust APIs and SDKs for easy
+                integration with existing systems. We support various
+                integration methods including REST APIs, webhooks, and direct
+                database connections. Our team provides full support during the
+                integration process.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>How often do you update your fraud detection models?</h3>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+              <p>
+                We update our models regularly based on new fraud patterns and
+                emerging threats. Critical updates are deployed immediately,
+                while major model retraining occurs monthly. We also provide
+                real-time adaptive learning capabilities for some workflows.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Multi-Domain Fraud Detection Platform</h3>
+          <p>
+            Empowering businesses with cutting-edge AI to detect and prevent
+            fraud across multiple domains.
+          </p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="/analytics">Analytics</a></li>
+            <li><a href="/security">Security</a></li>
+            <li><a href="/#report-fraud">Report Fraud</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section" id="contact">
+          <h4>Contact Us</h4>
+          <ul>
+            <li><i class="fas fa-envelope"></i> support@mdfdp.com</li>
+            <li><i class="fas fa-phone"></i> +91 xxxxx xxxxx</li>
+            <li><i class="fas fa-map-marker-alt"></i> Hyderabad, India</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>
+          &copy; 2025 Multi-Domain Fraud Detection Platform. All rights
+          reserved.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Smooth scrolling for anchor links -->
+    <script>
+      // Enable smooth scrolling for all anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          const targetId = this.getAttribute("href");
+          if (targetId === "#") return; // Skip empty links
+
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            e.preventDefault();
+            targetElement.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+    </script>
+  </body>
 </html>
-
-

@@ -23,7 +23,7 @@ class MDFDPBot:
                 'patterns': [r'help', r'what can you do', r'features', r'guide'],
                 'responses': [
                     "I can help you with:\n- Explaining specific fraud modules (e.g., 'Tell me about UPI fraud')\n- Navigating the dashboard\n- Understanding how to report fraud\n- Technical support",
-                    "Try asking me about 'Fake News Detection' or 'Credit Card Fraud' to learn more."
+                    "Try asking me about 'UPI Fraud' or 'Credit Card Fraud' to learn more."
                 ]
             },
             'upi_fraud': {
@@ -31,13 +31,6 @@ class MDFDPBot:
                 'responses': [
                     "Our UPI Fraud Detection module uses XGBoost to analyze transaction patterns like frequency, amount, and location changes. It flags suspicious transfers in real-time.",
                     "You can use the UPI module to check if a transaction looks risky based on historical behavior."
-                ]
-            },
-            'fake_news': {
-                'patterns': [r'fake news', r'misinformation', r'news'],
-                'responses': [
-                    "The Fake News module analyzes article text and source credibility using NLP and credibility scoring. It helps verify if a news piece is likely real or fabricated.",
-                    "Paste a news article into the Fake News detector to get a credibility score."
                 ]
             },
             'credit_card': {
@@ -57,14 +50,14 @@ class MDFDPBot:
             'general_fraud': {
                 'patterns': [r'fraud', r'scam', r'detect'],
                 'responses': [
-                    "We cover 10 types of fraud including UPI, Credit Card, Loan Default, Insurance, Click Fraud, Fake News, Spam, Phishing, Fake Profiles, and Document Forgery.",
+                    "We cover 5 types of fraud including UPI, Credit Card, Spam, Phishing, and Fake Profiles.",
                     "Select a specific module from the dashboard to start a detection task."
                 ]
             }
         }
         self.default_responses = [
             "I'm not sure I understand. Could you rephrase that?",
-            "I can tell you about our fraud modules. Try asking about 'UPI' or 'Fake News'.",
+            "I can tell you about our fraud modules. Try asking about 'UPI' or 'Credit Card'.",
             "Could you be more specific? I'm here to help with the MDFDP platform."
         ]
 
@@ -85,7 +78,7 @@ class MDFDPBot:
                     "messages": [
                         {
                             "role": "system",
-                            "content": "You are MDFDP (Multi-Domain Fraud Detection Platform) Bot, an intelligent assistant specialized in fraud detection. You help users understand fraud detection modules including UPI fraud, credit card fraud, fake news, phishing, spam, loan default, insurance fraud, click fraud, fake profiles, and document forgery. Provide helpful, accurate responses about fraud detection, machine learning models, and platform features. Keep responses concise and professional."
+                            "content": "You are MDFDP (Multi-Domain Fraud Detection Platform) Bot, an intelligent assistant specialized in fraud detection. You help users understand fraud detection modules including UPI fraud, credit card fraud, phishing, spam, and fake profiles. Provide helpful, accurate responses about fraud detection, machine learning models, and platform features. Keep responses concise and professional."
                         },
                         {
                             "role": "user",

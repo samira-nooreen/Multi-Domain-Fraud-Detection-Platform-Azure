@@ -26,7 +26,7 @@ Your chatbot has been upgraded with the Poe AI API key you provided.
 
 #### **3. System Prompt:**
 The bot is configured as:
-> "MDFDP (Multi-Domain Fraud Detection Platform) Bot, an intelligent assistant specialized in fraud detection. Helps users understand fraud detection modules including UPI fraud, credit card fraud, fake news, phishing, spam, loan default, insurance fraud, click fraud, fake profiles, and document forgery."
+> "MDFDP (Multi-Domain Fraud Detection Platform) Bot, an intelligent assistant specialized in fraud detection. Helps users understand fraud detection modules including UPI fraud, credit card fraud, fake news, phishing, spam, click fraud, fake profiles, and document forgery."
 
 ### 📋 **What the Chatbot Can Now Do:**
 

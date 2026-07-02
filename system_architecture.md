@@ -17,8 +17,6 @@ The system is composed of the following main components:
 3. **ML Modules**: 10 specialized fraud detection modules
    - UPI Fraud Detection
    - Credit Card Fraud Detection
-   - Loan Default Risk Prediction
-   - Insurance Fraud Detection
    - Click Fraud Detection
    - Fake News Detection
    - Spam Email Detection
@@ -60,7 +58,6 @@ The system is composed of the following main components:
 - **XGBoost**: Gradient boosting for transaction fraud and anomaly detection
 - **PyTorch**: Deep learning models (LSTM for sequences, CNN for images, GNN for graphs)
 - **TensorFlow**: Alternative deep learning support (optional)
-- **LightGBM**: Fast gradient boosting for loan default prediction
 - **Pandas & NumPy**: Data manipulation and numerical computing
 
 ### Database

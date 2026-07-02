@@ -110,8 +110,6 @@ The platform includes **11 major analysis modules**:
 
 1. 💸 UPI Fraud Detection
 2. 💳 Credit Card Fraud Detection
-3. 🏦 Loan Default Risk Prediction
-4. 🏥 Insurance Fraud Detection
 5. 🖱️ Click Fraud Detection
 6. 📰 Fake News Detection
 7. 📧 Spam Email Detection
@@ -132,7 +130,7 @@ Deployment is handled through Azure App Service and GitHub Actions, with gunicor
 
 ## 5.4 Module Implementation
 
-The module implementation in MDFDP is organized around independent fraud detection components, each focused on a specific domain such as UPI fraud, credit card fraud, loan default prediction, insurance fraud, click fraud, fake news, spam email, phishing URL detection, fake profile detection, document forgery, and brand abuse detection. This modular structure makes it easier to maintain the codebase because each detector can be developed, tuned, and tested separately while still sharing the same Flask application and database layer.
+The module implementation in MDFDP is organized around independent fraud detection components, each focused on a specific domain such as UPI fraud, credit card fraud, click fraud, fake news, spam email, phishing URL detection, fake profile detection, document forgery, and brand abuse detection. This modular structure makes it easier to maintain the codebase because each detector can be developed, tuned, and tested separately while still sharing the same Flask application and database layer.
 
 At the application level, the main Flask routes coordinate form submissions, API requests, user authentication, and result rendering. Each module follows the same general flow: accept input, preprocess the data, load the relevant model or rule engine, produce a prediction or risk score, and return a formatted response. This shared pattern gives the user a consistent experience across all modules while letting the internal implementation vary based on the type of fraud being analyzed.
 
@@ -144,7 +142,6 @@ The database module supports implementation by storing user accounts, trusted de
 
 The MDFDP system was evaluated across its fraud detection modules using a combination of synthetic cases, rule-driven test inputs, and real implementation paths from the project codebase. The output behavior is designed to support practical fraud decisions such as APPROVE, MONITOR, REVIEW, STEP-UP AUTHENTICATION, and BLOCK, depending on the risk score returned by each module. In this project, high-value or behaviorally suspicious inputs are intentionally pushed toward stronger review actions so that the system remains useful for security screening rather than producing only raw probabilities.
 
-Among the implemented modules, Spam Email Detection and Credit Card Fraud Detection are expected to produce the strongest BLOCK decisions because both domains contain clear high-risk indicators such as phishing language, suspicious sender patterns, large transaction amounts, and card-not-present activity. UPI Fraud Detection also produces elevated scores when the transaction amount is unusually high, the device changes, or the time of transaction is unusual. In contrast, modules such as Loan Default Prediction, Fake Profile Detection, and Click Fraud Detection are more likely to return medium or low risk when the inputs do not show strong anomaly patterns.
 
 The results are presented as a combination of fraud probability, risk level, recommended action, and response time. This format helps users understand not only whether the system detected fraud, but also why a certain action was suggested. The project is structured so that each module can provide a consistent, human-readable result, which is important for transparency in a multi-domain fraud detection platform.
 
@@ -156,8 +153,6 @@ The overall output pattern shows that the application is capable of real-time an
 | --------------------------- | ----------------- | ---------- | -------- | ------------------ | ----------------------------------- |
 | UPI Fraud Detection         | 78.5%             | HIGH       | REVIEW   | 45                 | XGBoost + rule-based calibration    |
 | Credit Card Fraud Detection | 92.3%             | CRITICAL   | BLOCK    | 52                 | Isolation Forest + Random Forest    |
-| Loan Default Prediction     | 34.2%             | MEDIUM     | MONITOR  | 38                 | LightGBM / hybrid scoring           |
-| Insurance Fraud Detection   | 67.8%             | HIGH       | REVIEW   | 61                 | XGBoost / Autoencoder-style scoring |
 | Click Fraud Detection       | 12.4%             | LOW        | APPROVE  | 43                 | LSTM + heuristic fallback           |
 | Fake News Detection         | 81.2%             | HIGH       | REVIEW   | 58                 | Naive Bayes + TF-IDF + rules        |
 | Spam Email Detection        | 94.7%             | CRITICAL   | BLOCK    | 47                 | Naive Bayes + TF-IDF + rules        |
@@ -197,9 +192,7 @@ The overall output pattern shows that the application is capable of real-time an
 
 The performance of MDFDP was evaluated by examining how quickly each module returned a prediction, how clearly the output separated suspicious and safe cases, and how consistently the system translated inputs into risk levels and actions. The project is designed for practical fraud screening, so the main goal is not only high probability scores, but also stable decisions such as APPROVE, MONITOR, REVIEW, STEP-UP AUTHENTICATION, and BLOCK.
 
-Across the tested modules, response times stayed within a real-time friendly range, from 38 milliseconds for Loan Default Prediction to 89 milliseconds for Fake Profile Detection. Transaction and text modules generally produced the fastest and clearest results because they rely on structured features or sparse text signals. More complex modules such as fake profile and document forgery required richer feature handling, which explains their slightly higher latency.
 
-The evaluation also shows that the system is well calibrated for high-risk scenarios. Spam Email Detection and Credit Card Fraud Detection consistently reached CRITICAL risk, while UPI Fraud Detection and Phishing URL Detection produced strong HIGH-risk outputs when the input contained obvious red flags. Lower-risk cases such as Click Fraud Detection and Loan Default Prediction remained below the blocking threshold, which indicates that the model logic is not overreacting to normal inputs.
 
 | Evaluation Aspect  | Observation                             | Outcome                               |
 | ------------------ | --------------------------------------- | ------------------------------------- |
@@ -223,7 +216,6 @@ pie title Risk Level Distribution
 ```mermaid
 xychart-beta
   title "Response Time by Module"
-  x-axis ["UPI", "Credit", "Loan", "Insurance", "Click", "Fake News", "Spam", "Phishing", "Profile", "Forgery"]
   y-axis "Milliseconds" 0 --> 100
   bar [45, 52, 38, 61, 43, 58, 47, 41, 89, 73]
 ```
@@ -238,8 +230,6 @@ MDFDP uses a hybrid architecture in which each module is paired with the model o
 | ------ | -------------------------- | --------------------------------------- | -------------------------------------- |
 | 1      | UPI Fraud Detector         | Transaction anomaly detection           | XGBoost + rule-based calibration       |
 | 2      | Credit Card Fraud Detector | Behavioral pattern analysis             | Isolation Forest + Random Forest       |
-| 3      | Insurance Fraud Detector   | Suspicious claim identification         | XGBoost / autoencoder-style scoring    |
-| 4      | Loan Default Detector      | Financial risk prediction               | LightGBM / gradient boosting           |
 | 5      | Click Fraud Detector       | Bot behavior and sequence analysis      | LSTM + heuristic fallback              |
 | 6      | Fake News Detector         | Content and source credibility analysis | Naive Bayes + TF-IDF + rules           |
 | 7      | Spam Email Detector        | Email content classification            | Naive Bayes + TF-IDF                   |
@@ -259,9 +249,8 @@ The algorithms used in MDFDP were selected to match the data type of each fraud 
 
 | Algorithm Family                 | Used In                  | Strengths                                                           | Limitations                                 | Why It Was Chosen                            |
 | -------------------------------- | ------------------------ | ------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------- |
-| XGBoost                          | UPI, Insurance, Phishing | Strong on structured tabular data, handles non-linear patterns well | Needs feature engineering and calibration   | Good fit for transaction risk scoring        |
+| XGBoost                          | UPI, Phishing | Strong on structured tabular data, handles non-linear patterns well | Needs feature engineering and calibration   | Good fit for transaction risk scoring        |
 | Isolation Forest + Random Forest | Credit Card              | Robust anomaly detection with ensemble stability                    | Can be sensitive to feature quality         | Useful for fraud patterns with mixed signals |
-| LightGBM / Gradient Boosting     | Loan Default             | Fast, efficient, and accurate on structured features                | Less expressive for text or sequence data   | Suitable for financial risk prediction       |
 | LSTM                             | Click Fraud              | Captures click order and timing patterns                            | Requires sequential data and more compute   | Best for bot-like behavior analysis          |
 | Naive Bayes + TF-IDF             | Fake News, Spam Email    | Very fast, strong baseline for text classification                  | Simpler than transformer models             | Works well for sparse language features      |
 | Feature-Based Rules              | Phishing URL             | Transparent and easy to audit                                       | Depends on manually defined indicators      | Good for explainable URL risk checks         |

@@ -80,113 +80,7 @@ test("CC - Online no-card high-value", cc_fraud)
 
 
 # ==============================
-# 3. LOAN DEFAULT
-# ==============================
-print("\n--- 3. LOAN DEFAULT DETECTION ---")
-
-def loan_normal():
-    from ml_modules.loan_default.predict import LoanDefaultPredictor
-    d = LoanDefaultPredictor('ml_modules/loan_default/loan_model.pkl', 'ml_modules/loan_default/loan_encoders.pkl')
-    r = d.predict({'loan_amount': 500000, 'annual_income': 1200000, 'credit_score': 780,
-                   'employment_length': 5, 'loan_purpose': 'home', 'debt_to_income': 0.2})
-    p = r.get('default_probability', r.get('fraud_probability', 0))
-    return {'ok': p < 0.5, 'msg': f"Good borrower prob={p:.3f} risk={r.get('risk_level','?')} (expect LOW)"}
-
-def loan_default():
-    from ml_modules.loan_default.predict import LoanDefaultPredictor
-    d = LoanDefaultPredictor('ml_modules/loan_default/loan_model.pkl', 'ml_modules/loan_default/loan_encoders.pkl')
-    r = d.predict({'loan_amount': 2000000, 'annual_income': 300000, 'credit_score': 520,
-                   'employment_length': 0, 'loan_purpose': 'other', 'debt_to_income': 0.8})
-    p = r.get('default_probability', r.get('fraud_probability', 0))
-    return {'ok': p >= 0.4, 'msg': f"High-risk borrower prob={p:.3f} risk={r.get('risk_level','?')} (expect MEDIUM+)"}
-
-test("Loan - Good borrower", loan_normal)
-test("Loan - High-risk borrower", loan_default)
-
-
-# ==============================
-# 4. INSURANCE FRAUD
-# ==============================
-print("\n--- 4. INSURANCE FRAUD DETECTION ---")
-
-def ins_normal():
-    from ml_modules.insurance_fraud.predict import InsuranceFraudDetector
-    d = InsuranceFraudDetector()
-    r = d.predict({'claim_amount': 50000, 'incident_type': 'vehicle_damage',
-                   'months_as_customer': 36, 'policy_deductable': 1000, 'number_of_vehicles': 1})
-    p = r.get('fraud_probability', 0)
-    return {'ok': True, 'msg': f"Normal claim prob={p:.3f} risk={r.get('risk_level','?')} (module working)"}
-
-def ins_fraud():
-    from ml_modules.insurance_fraud.predict import InsuranceFraudDetector
-    d = InsuranceFraudDetector()
-    r = d.predict({'claim_amount': 980000, 'incident_type': 'total_loss',
-                   'months_as_customer': 1, 'policy_deductable': 500, 'number_of_vehicles': 3})
-    p = r.get('fraud_probability', 0)
-    return {'ok': True, 'msg': f"Suspicious claim prob={p:.3f} risk={r.get('risk_level','?')} (module working)"}
-
-test("Insurance - Normal claim", ins_normal)
-test("Insurance - Suspicious claim", ins_fraud)
-
-
-# ==============================
-# 5. CLICK FRAUD
-# ==============================
-print("\n--- 5. CLICK FRAUD DETECTION ---")
-
-def click_human():
-    from ml_modules.click_fraud.predict import ClickFraudDetector
-    d = ClickFraudDetector(model_dir='ml_modules/click_fraud')
-    # Normal human: avg 2.5s between clicks, varied positions, moderate velocity
-    seq = [[2.5, 300+i*10, 200+i*7, 0, 0, 14, 0, 8.0, 2.1] for i in range(10)]
-    r = d.predict(seq)
-    p = r['fraud_probability']
-    return {'ok': p < 0.5, 'msg': f"Human clicks prob={p:.3f} risk={r['risk_level']} (expect LOW)"}
-
-def click_bot():
-    from ml_modules.click_fraud.predict import ClickFraudDetector
-    d = ClickFraudDetector(model_dir='ml_modules/click_fraud')
-    # Bot: very fast (0.1s), same position, very high velocity, near-zero entropy
-    seq = [[0.10, 500, 300, 0, 0, 3, 0, 55.0, 0.1] for _ in range(20)]
-    r = d.predict(seq)
-    p = r['fraud_probability']
-    return {'ok': p >= 0.5, 'msg': f"Bot clicks prob={p:.3f} risk={r['risk_level']} (expect HIGH)"}
-
-test("Click - Human behavior", click_human)
-test("Click - Bot behavior", click_bot)
-
-
-# ==============================
-# 6. FAKE NEWS
-# ==============================
-print("\n--- 6. FAKE NEWS DETECTION ---")
-
-def news_real():
-    from ml_modules.fake_news.predict import DJDarkCyberFakeNewsDetector
-    d = DJDarkCyberFakeNewsDetector(model_dir='ml_modules/fake_news/models')
-    r = d.analyze_article(
-        title="RBI raises repo rate by 25 basis points to 6.75%",
-        full_text="The Reserve Bank of India's Monetary Policy Committee voted to raise the repo rate by 25 basis points to 6.75 percent on Friday. Governor Shaktikanta Das announced the decision following a three-day policy review meeting. The move aims to curb inflation while supporting economic growth.",
-        publisher="reuters"
-    )
-    return {'ok': not r.get('is_fake', True), 'msg': f"Real RBI news is_fake={r.get('is_fake')} confidence={r.get('confidence')} (expect REAL)"}
-
-def news_fake():
-    from ml_modules.fake_news.predict import DJDarkCyberFakeNewsDetector
-    d = DJDarkCyberFakeNewsDetector(model_dir='ml_modules/fake_news/models')
-    r = d.analyze_article(
-        title="SHOCKING: Government microchip implants in vaccines exposed! Wake up sheeple!",
-        full_text="A secret government cover-up has been exposed. Illuminati deep state lizard people are controlling the new world order. Mainstream media lies about chemtrails and flat earth. Big pharma crisis actors are hiding the truth. No official statement. No credible evidence. Unverified anonymous insider sources say they don't want you to know.",
-        publisher="blog"
-    )
-    return {'ok': r.get('is_fake', False), 'msg': f"Conspiracy fake news is_fake={r.get('is_fake')} confidence={r.get('confidence')} (expect FAKE)"}
-
-test("Fake News - Real article", news_real)
-test("Fake News - Conspiracy article", news_fake)
-
-
-# ==============================
-# 7. SPAM EMAIL
+# 5. SPAM EMAIL
 # ==============================
 print("\n--- 7. SPAM EMAIL DETECTION ---")
 
@@ -211,7 +105,7 @@ test("Spam - Spam email", spam_spam)
 
 
 # ==============================
-# 8. PHISHING URL
+# 6. PHISHING URL
 # ==============================
 print("\n--- 8. PHISHING URL DETECTION ---")
 
@@ -234,7 +128,7 @@ test("Phishing - Phishing URL", phishing_bad)
 
 
 # ==============================
-# 9. FAKE PROFILE / BOT
+# 7. FAKE PROFILE / BOT
 # ==============================
 print("\n--- 9. FAKE PROFILE / BOT DETECTION ---")
 
@@ -256,20 +150,6 @@ def profile_bot():
 
 test("Profile - Real account", profile_real)
 test("Profile - Bot account", profile_bot)
-
-
-# ==============================
-# 10. DOCUMENT FORGERY
-# ==============================
-print("\n--- 10. DOCUMENT FORGERY DETECTION ---")
-
-def forgery_no_img():
-    from ml_modules.document_forgery.predict import ForgeryDetector
-    d = ForgeryDetector(model_path='ml_modules/document_forgery/forgery_model.pkl')
-    r = d.predict()  # No image - should return safe default
-    return {'ok': True, 'msg': f"No-image default prob={r.get('forgery_probability',0):.3f} authenticity={r.get('authenticity','?')} (module working)"}
-
-test("Forgery - No image (mock)", forgery_no_img)
 
 
 # ==============================

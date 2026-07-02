@@ -12,12 +12,6 @@ except Exception as e:
     print(f"❌ Spam Email: {e}")
 
 try:
-    from ml_modules.fake_news.predict import DJDarkCyberFakeNewsDetector
-    print("✅ Fake News: OK")
-except Exception as e:
-    print(f"❌ Fake News: {e}")
-
-try:
     from ml_modules.chatbot import MDFDPBot
     print("✅ Chatbot: OK")
 except Exception as e:

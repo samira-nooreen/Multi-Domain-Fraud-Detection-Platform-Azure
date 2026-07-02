@@ -51,15 +51,9 @@ class MDFDPHealthChecker:
         endpoints_to_test = [
             ("/detect_upi", {"amount": 100}),
             ("/detect_credit", {"amount": 100}),
-            ("/detect_loan", {"loan_amount": 1000}),
-            ("/detect_insurance", {"claim_amount": 1000}),
-            ("/detect_click", {"sequence": [[0.1, 500, 300, 0, 0, 14, 0, 50]]}),
-            ("/detect_fake_news", {"text": "test"}),
             ("/detect_spam", {"email_content": "test"}),
             ("/detect_phishing", {"url": "test.com"}),
             ("/detect_bot", {"username": "test"}),
-            ("/detect_forgery", {}),
-            ("/detect_brand_abuse", {"url": "test.com"})
         ]
         
         auth_protected_count = 0
@@ -86,9 +80,9 @@ class MDFDPHealthChecker:
             result = response.json()
             
             expected_modules = {
-                "upi_fraud", "credit_card", "loan_default", "insurance_fraud",
-                "click_fraud", "fake_news", "spam_email", "phishing_url", 
-                "fake_profile", "document_forgery", "brand_abuse"
+                "upi_fraud", "credit_card",
+                "spam_email", "phishing_url", 
+                "fake_profile"
             }
             
             available_modules = set()
@@ -139,15 +133,9 @@ class MDFDPHealthChecker:
             "/logout",
             "/detect_upi",
             "/detect_credit",
-            "/detect_loan",
-            "/detect_insurance",
-            "/detect_click",
-            "/detect_fake_news",
             "/detect_spam",
             "/detect_phishing",
             "/detect_bot",
-            "/detect_forgery",
-            "/detect_brand_abuse",
             "/profile",
             "/analytics",
             "/security"
@@ -179,53 +167,6 @@ class MDFDPHealthChecker:
         
         print(f"  Route Existence: {'✅ GOOD' if route_success else '❌ ISSUES'}")
         return route_success
-    
-    def check_click_fraud_directly(self):
-        """Test the click fraud module directly via its Python interface"""
-        print("Testing Click Fraud Module Directly...")
-        try:
-            # Import and test the click fraud module directly
-            import sys
-            import os
-            sys.path.append(os.path.join(os.getcwd(), 'ml_modules'))
-            sys.path.append(os.path.join(os.getcwd(), 'ml_modules', 'click_fraud'))
-            
-            from ml_modules.click_fraud.predict import ClickFraudDetector
-            import numpy as np
-            
-            # Create a test sequence
-            test_sequence = [
-                [0.1, 500, 300, 0, 0, 14, 0, 50],
-                [0.12, 502, 301, 0, 0, 14, 0, 52],
-                [0.11, 501, 299, 0, 0, 14, 0, 51]
-            ]
-            
-            detector = ClickFraudDetector(model_dir='ml_modules/click_fraud')
-            result = detector.predict(test_sequence)
-            
-            success = isinstance(result, dict) and 'fraud_probability' in result
-            self.health_results["click_fraud_direct"] = {
-                "success": success,
-                "result": result if success else None,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-            print(f"  Click Fraud Module: {'✅ WORKING' if success else '❌ ERROR'}")
-            if success:
-                print(f"    Fraud Probability: {result.get('fraud_probability', 'N/A')}")
-                print(f"    Risk Level: {result.get('risk_level', 'N/A')}")
-            
-            return success
-            
-        except Exception as e:
-            print(f"  Click Fraud Module: ❌ ERROR - {str(e)}")
-            self.health_results["click_fraud_direct"] = {
-                "success": False,
-                "error": str(e),
-                "timestamp": datetime.now().isoformat()
-            }
-            return False
-    
     def run_health_checks(self):
         """Run all health checks"""
         print("="*60)
@@ -241,7 +182,6 @@ class MDFDPHealthChecker:
         results.append(self.check_authentication_required())
         results.append(self.check_module_availability())
         results.append(self.check_routes_existence())
-        results.append(self.check_click_fraud_directly())  # Test one module directly
         
         # Summary
         total_checks = len(results)

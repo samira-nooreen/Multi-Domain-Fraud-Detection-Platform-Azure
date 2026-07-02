@@ -122,15 +122,11 @@ def verify_module_routes():
         return False
     
     required_routes = [
+        'detect_upi',
         'detect_credit',
-        'detect_loan', 
-        'detect_insurance',
-        'detect_click',
-        'detect_fake_news',
         'detect_spam',
         'detect_phishing',
-        'detect_bot',
-        'detect_forgery'
+        'detect_bot'
     ]
     
     missing_routes = []

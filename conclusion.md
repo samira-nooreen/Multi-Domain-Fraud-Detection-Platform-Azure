@@ -23,7 +23,7 @@ The platform's lightweight design and open-source foundations make it suitable f
 
 ### Financial Services & Banking
 
-- **Transaction Monitoring**: Real-time detection of suspicious UPI, credit card, and loan activities enables rapid intervention before fraud is completed.
+- **Transaction Monitoring**: Real-time detection of suspicious UPI, credit card activities enables rapid intervention before fraud is completed.
 - **Risk Scoring**: Consistent risk bands (LOW/MEDIUM/HIGH/CRITICAL) and recommended actions simplify compliance workflows and support regulatory audit trails.
 - **Behavioral Analytics**: Cross-channel signals (transaction patterns, device changes, time anomalies) provide richer fraud indicators than single-channel analysis.
 
@@ -42,9 +42,7 @@ The platform's lightweight design and open-source foundations make it suitable f
 - **Fake Profile Detection**: Graph-based analysis identifies coordinated inauthentic behavior and bot networks.
 - **Account Fraud Prevention**: Multi-factor authentication combined with device trust scoring prevents unauthorized access.
 
-### Insurance & Claims
 
-- **Claims Validation**: Insurance fraud detection flags suspicious patterns in claim amounts, timing, and claimant behavior, reducing loss ratios.
 - **Risk Underwriting**: Historical fraud indicators can inform pricing and underwriting decisions.
 
 ### Document Verification

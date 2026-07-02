@@ -5,6 +5,8 @@ This repository is ready for two Azure paths:
 1. Azure App Service on Linux using the existing Gunicorn startup command.
 2. Azure Container Apps or App Service for Containers using the included Dockerfile.
 
+The current homepage is trimmed down to the heat-map and incident dashboard, so the deployment package no longer needs the old module-card shortcuts on the landing page.
+
 For GitHub-based deployments, the repository now includes a GitHub Actions workflow that deploys to Azure Web App on every push to `main`.
 
 ## Direct Deploy From VS Code
@@ -41,6 +43,12 @@ gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --worker-class gthread --threa
 
 12. Save, restart the app, then use Browse Website from VS Code.
 13. If it fails, open Start Streaming Logs from the Azure explorer.
+
+### Website checks after deployment
+
+1. Confirm the homepage hero shows the Azure deployment badge.
+2. Confirm the heat-map dashboard loads and the removed module buttons are not shown.
+3. Confirm `/login` and `/signup` still render and redirect through the 2FA flow.
 
 ## Option 1: Azure App Service
 

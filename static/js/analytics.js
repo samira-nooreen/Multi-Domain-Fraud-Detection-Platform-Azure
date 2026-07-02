@@ -447,12 +447,7 @@ async function fetchAnomalyData() {
             { id: 2, type: "Credit Card Fraud Detection", location: "Delhi", severity: "high", time: "15 sec ago", description: "Unusual spending pattern detected", cases: 41 },
             { id: 3, type: "Phishing URL Detection", location: "Bangalore", severity: "medium", time: "32 sec ago", description: "Malicious URL flagged", cases: 59 },
             { id: 4, type: "Fake Profile Detection", location: "Chennai", severity: "medium", time: "48 sec ago", description: "Suspicious bot activity detected", cases: 54 },
-            { id: 5, type: "Document Forgery Detection", location: "Hyderabad", severity: "high", time: "1 min ago", description: "Document authenticity verification failed", cases: 45 },
-            { id: 6, type: "Loan Default Prediction", location: "Pune", severity: "critical", time: "2 min ago", description: "High-risk loan application detected", cases: 30 },
-            { id: 7, type: "Insurance Fraud Detection", location: "Kolkata", severity: "medium", time: "3 min ago", description: "Suspicious claim pattern identified", cases: 42 },
-            { id: 8, type: "Click Fraud Detection", location: "Ahmedabad", severity: "low", time: "5 min ago", description: "Automated clicking behavior detected", cases: 25 },
-            { id: 9, type: "Spam Email Detection", location: "Jaipur", severity: "high", time: "7 min ago", description: "Bulk spam campaign identified", cases: 38 },
-            { id: 10, type: "Fake News Detection", location: "Lucknow", severity: "medium", time: "10 min ago", description: "Misinformation content flagged", cases: 52 }
+            { id: 5, type: "Spam Email Detection", location: "Jaipur", severity: "high", time: "7 min ago", description: "Bulk spam campaign identified", cases: 38 }
         ];
         
         // Process fallback data for chart
@@ -840,11 +835,8 @@ function generateRecommendations(attackType, riskLevel, detectionDelay) {
     } else if (attackType === 'ransomware') {
         recommendations.push('📜 Ensure compliance with cybersecurity regulations');
         recommendations.push('🔒 Implement data protection impact assessments (DPIAs)');
-        recommendations.push('📋 Establish cyber insurance coverage and incident response funding');
     }
 
-    // Add financial recommendations
-    recommendations.push('💰 Consider cyber insurance coverage for financial protection');
     recommendations.push('💼 Engage forensic experts for post-incident analysis');
     recommendations.push('⚖️ Consult legal counsel for regulatory compliance and liability issues');
 

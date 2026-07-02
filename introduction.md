@@ -17,7 +17,7 @@ Organizations face a fragmented fraud detection landscape where different channe
 
 ## 1.4 Scope of the Project
 
-This project focuses on developing and demonstrating detection modules for UPI transactions, credit card fraud, loan default prediction, insurance fraud, click fraud, fake news, spam email, phishing URLs, fake profiles, and document forgery. It includes model management, a Flask-based API, a real-time dashboard, and local persistence (SQLite). It does not include enterprise-grade features such as distributed storage, high-availability clustering, or fully managed model governance pipelines.
+This project focuses on developing and demonstrating detection modules for UPI transactions, credit card fraud, click fraud, fake news, spam email, phishing URLs, fake profiles, and document forgery. It includes model management, a Flask-based API, a real-time dashboard, and local persistence (SQLite). It does not include enterprise-grade features such as distributed storage, high-availability clustering, or fully managed model governance pipelines.
 
 ## 1.5 Need for the Proposed System
 
@@ -25,7 +25,6 @@ A practical multi-domain fraud platform reduces blind spots by correlating signa
 
 ## 1.6 Methodology Adopted
 
-The platform uses a hybrid methodology combining: (1) supervised and ensemble ML models for tabular transaction data (XGBoost, LightGBM, RandomForest), (2) lightweight NLP models for text classification (TF-IDF + Naive Bayes), (3) sequence models (LSTM) for behavioral data, (4) graph models (GNN) for profile analysis, (5) CNN-style approaches for image forgery signals, and (6) rule-based calibration for explainability and thresholding. Each module is implemented independently, with a shared Flask API and a lazy-loading model cache to reduce runtime memory usage. Evaluation uses synthetic and recorded test cases, and latency measurements to ensure near real-time performance.
 
 ## 1.7 Existing System
 

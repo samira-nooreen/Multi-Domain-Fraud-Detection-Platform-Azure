@@ -1,42 +1,25 @@
-"""
-Test Script for Fake News and Spam Email Detection
-Tests both modules with sample data
-"""
+"""Legacy smoke test updated to active modules only."""
 
-print("="*70)
-print("🧪 TESTING FAKE NEWS DETECTION MODULE")
-print("="*70)
+print("=" * 70)
+print("🧪 TESTING SPAM EMAIL DETECTION MODULE")
+print("=" * 70)
 
-from ml_modules.fake_news.predict import FakeNewsDetector
+from ml_modules.spam_email.predict import SpamDetector
 
-detector = FakeNewsDetector(model_dir='ml_modules/fake_news/models')
+detector = SpamDetector(model_path='ml_modules/spam_email/spam_model.pkl', vec_path='ml_modules/spam_email/spam_vectorizer.pkl')
 
-# Test cases
-test_articles = [
-    {
-        "title": "Real News Example",
-        "content": "Officials report 3.5% increase in economic growth this year. The Federal Reserve announced new policy measures to address inflation concerns."
-    },
-    {
-        "title": "Fake News Example - Floating Continent",
-        "content": "Scientists Discover a Floating Continent in the Middle of the Ocean. A viral social media post falsely claimed that researchers found a floating continent in the Pacific Ocean. No scientific organization has reported anything similar, and experts confirm the image circulating online was digitally edited."
-    },
-    {
-        "title": "Fake News Example - Miracle Cure",
-        "content": "SHOCKING: Lemon Juice Proven to Cure All Cancers Within 48 Hours! Doctors HATE this miracle cure that Big Pharma doesn't want you to know!"
-    }
+samples = [
+    "Hi John, let's schedule a meeting to discuss the Q4 report.",
+    "URGENT: Your account will be suspended! Click here to verify your information now!",
 ]
 
-for i, article in enumerate(test_articles, 1):
-    print(f"\n{'─'*70}")
-    print(f"📰 Test Case {i}: {article['title']}")
-    print(f"{'─'*70}")
-    
-    full_text = article['title'] + "\n\n" + article['content']
-    result = detector.predict(full_text, use_ensemble=True)
-    
-    print(f"Classification: {'🚨 FAKE NEWS' if result['is_fake'] else '✅ REAL NEWS'}")
-    print(f"Fake Probability: {result['fake_probability']:.2%}")
+for index, sample in enumerate(samples, 1):
+    print(f"\n{'─' * 70}")
+    print(f"📧 Test Case {index}")
+    print(f"{'─' * 70}")
+    result = detector.predict(sample, use_ensemble=True)
+    print(f"Classification: {'🚨 SPAM' if result['is_spam'] else '✅ HAM'}")
+    print(f"Spam Probability: {result['spam_probability']:.2%}")
     print(f"Confidence: {result['confidence']}")
     if 'models_used' in result:
         print(f"Models Used: {', '.join(result['models_used'])}")

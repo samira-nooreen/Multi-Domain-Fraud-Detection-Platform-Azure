@@ -1,8 +1,6 @@
 ML Algorithms Implemented in Fraud Detection System:
 1. UPI Fraud Detection - XGBoost
 2. Credit Card Fraud Detection - Isolation Forest + Random Forest
-3. Loan Default Prediction - LightGBM
-4. Insurance Fraud Detection - Autoencoder
 5. Click Fraud Detection - LSTM + CatBoost
 6. Fake News Detection - Naive Bayes + Rule-based
 7. Spam Email Detection - Naive Bayes, Random Forest, LSTM, DistilBERT

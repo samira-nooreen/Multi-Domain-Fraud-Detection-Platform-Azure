@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spam Email Detection - MDFDP</title>
+    <title>Email Risk Analysis - MDFDP</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
@@ -13,34 +13,160 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
+      :root {
+        --bg: #0a0a0c;
+        --panel: rgba(20, 20, 27, 0.92);
+        --line: rgba(255, 255, 255, 0.08);
+        --text: #f3f4ff;
+        --muted: #b7b3c9;
+        --accent: #8876f8;
+        --accent-2: #5fd1ff;
+        --danger: #ff6b6b;
+        --warning: #ffd166;
+        --success: #38ef7d;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(136, 118, 248, 0.12),
+            transparent 28%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(95, 209, 255, 0.1),
+            transparent 25%
+          ),
+          var(--bg);
+        color: var(--text);
+      }
+
       .container {
-        max-width: 900px;
+        max-width: 1120px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 28px 20px 56px;
       }
 
-      .header {
-        text-align: center;
-        margin-bottom: 30px;
+      .top-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 20px;
+        margin-bottom: 24px;
       }
 
-      .header h1 {
-        color: #8876f8;
-        font-size: 2.5rem;
-        margin-bottom: 10px;
+      .hero-panel,
+      .side-panel,
+      .card,
+      .result-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(16px);
       }
 
-      .header p {
-        color: #b7b3c9;
-        font-size: 1.1rem;
+      .hero-panel,
+      .side-panel,
+      .card,
+      .result-card {
+        border-radius: 24px;
+      }
+
+      .hero-panel {
+        padding: 30px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-bottom: 18px;
+        border-radius: 999px;
+        background: rgba(136, 118, 248, 0.16);
+        color: #ddd8ff;
+        border: 1px solid rgba(136, 118, 248, 0.28);
+        font-size: 0.88rem;
+      }
+
+      .hero-panel h1 {
+        color: var(--text);
+        font-size: clamp(2rem, 4vw, 3.4rem);
+        line-height: 1.02;
+        margin: 0 0 14px;
+      }
+
+      .hero-panel p {
+        color: var(--muted);
+        font-size: 1.02rem;
+        line-height: 1.7;
+        margin: 0;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .mini-stat {
+        border-radius: 16px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .mini-stat .label {
+        color: var(--muted);
+        font-size: 0.84rem;
+        margin-bottom: 6px;
+      }
+
+      .mini-stat .value {
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      .side-panel {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 14px;
+      }
+
+      .side-panel h2,
+      .card h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .checklist {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .checklist li {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .checklist i {
+        color: var(--success);
+        margin-top: 3px;
       }
 
       .card {
-        background: #14141b;
-        border-radius: 15px;
-        padding: 30px;
-        margin-bottom: 30px;
-        border: 1px solid #2a2a35;
+        padding: 28px;
+        margin-bottom: 24px;
       }
 
       .form-group {
@@ -58,18 +184,23 @@
       .form-group textarea {
         width: 100%;
         padding: 12px 15px;
-        border-radius: 8px;
+        border-radius: 12px;
         border: 1px solid #2a2a35;
         background: #0d0d0f;
         color: #e6e6e6;
         font-size: 1rem;
         font-family: inherit;
+        transition:
+          border-color 0.2s ease,
+          transform 0.2s ease;
+        box-sizing: border-box;
       }
 
       .form-group input:focus,
       .form-group textarea:focus {
         outline: none;
-        border-color: #8876f8;
+        border-color: var(--accent);
+        transform: translateY(-1px);
       }
 
       .form-group textarea {
@@ -77,12 +208,34 @@
         resize: vertical;
       }
 
+      .sample-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 12px 0 16px;
+      }
+
+      .sample-chip {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+        color: #e9e7ff;
+        padding: 9px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+
+      .sample-chip:hover {
+        border-color: rgba(136, 118, 248, 0.35);
+        color: white;
+      }
+
       .btn-analyze {
         background: linear-gradient(135deg, #8876f8 0%, #7059d2 100%);
         color: white;
         border: none;
         padding: 15px 30px;
-        border-radius: 8px;
+        border-radius: 14px;
         font-size: 1.1rem;
         font-weight: 600;
         cursor: pointer;
@@ -95,13 +248,39 @@
         box-shadow: 0 10px 20px rgba(136, 118, 248, 0.3);
       }
 
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 30px;
+      }
+
+      .loading.show {
+        display: block;
+      }
+
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid var(--accent);
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
       .result-card {
         display: none;
-        background: #14141b;
-        border-radius: 15px;
-        padding: 30px;
+        padding: 28px;
         margin-top: 30px;
-        border: 1px solid #2a2a35;
       }
 
       .result-card.show {
@@ -112,19 +291,17 @@
         text-align: center;
         margin-bottom: 25px;
         padding-bottom: 20px;
-        border-bottom: 1px solid #2a2a35;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       }
 
       .result-header.spam {
-        color: #ff6b6b;
+        color: var(--danger);
       }
-
       .result-header.safe {
-        color: #38ef7d;
+        color: var(--success);
       }
-
       .result-header.warning {
-        color: #ffd166;
+        color: var(--warning);
       }
 
       .result-icon {
@@ -140,7 +317,7 @@
 
       .result-subtitle {
         font-size: 1.1rem;
-        color: #b7b3c9;
+        color: var(--muted);
       }
 
       .result-details {
@@ -151,15 +328,15 @@
       }
 
       .detail-item {
-        background: #0d0d0f;
+        background: rgba(255, 255, 255, 0.03);
         padding: 20px;
-        border-radius: 10px;
+        border-radius: 14px;
         text-align: center;
       }
 
       .detail-label {
         font-size: 0.9rem;
-        color: #b7b3c9;
+        color: var(--muted);
         margin-bottom: 8px;
       }
 
@@ -198,44 +375,33 @@
       }
 
       .analysis-section h3 {
-        color: #8876f8;
+        color: var(--accent);
         margin-bottom: 15px;
-        font-size: 1.3rem;
+        font-size: 1.1rem;
       }
 
       .analysis-content {
-        background: #0d0d0f;
+        background: rgba(255, 255, 255, 0.03);
         padding: 20px;
-        border-radius: 10px;
-        border-left: 4px solid #8876f8;
+        border-radius: 14px;
+        border-left: 4px solid var(--accent);
       }
 
-      .loading {
-        display: none;
-        text-align: center;
-        padding: 30px;
+      .nav-spacer {
+        height: 18px;
       }
 
-      .loading.show {
-        display: block;
-      }
-
-      .spinner {
-        border: 4px solid rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        border-top: 4px solid #8876f8;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
+      @media (max-width: 860px) {
+        .top-grid {
+          grid-template-columns: 1fr;
         }
-        100% {
-          transform: rotate(360deg);
+
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 18px 14px 40px;
         }
       }
     </style>
@@ -270,10 +436,55 @@
         ><i class="fas fa-user"></i> Profile</a
       >
     </nav>
+
+    <div class="nav-spacer"></div>
+
     <div class="container">
-      <div class="header">
-        <h1><i class="fas fa-envelope"></i> Spam Email Detection</h1>
-        <p>Analyze email content to detect spam and malicious messages</p>
+      <div class="top-grid">
+        <div class="hero-panel">
+          <div class="eyebrow">
+            <i class="fas fa-envelope-open-text"></i>
+            Email risk workspace
+          </div>
+          <h1>Analyze suspicious email content in one screen</h1>
+          <p>
+            Paste the sender and message body to score spam risk, identify
+            phishing patterns, and see a concise recommendation for next steps.
+          </p>
+
+          <div class="hero-grid">
+            <div class="mini-stat">
+              <div class="label">Signal focus</div>
+              <div class="value">Spam + phishing</div>
+            </div>
+            <div class="mini-stat">
+              <div class="label">Response</div>
+              <div class="value">Real-time</div>
+            </div>
+            <div class="mini-stat">
+              <div class="label">Output</div>
+              <div class="value">Risk + guidance</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-panel">
+          <h2>What this page checks</h2>
+          <ul class="checklist">
+            <li>
+              <i class="fas fa-check-circle"></i> Sender spoofing and suspicious
+              reply-to details
+            </li>
+            <li>
+              <i class="fas fa-check-circle"></i> Urgent language, links, and
+              call-to-action abuse
+            </li>
+            <li>
+              <i class="fas fa-check-circle"></i> Borderline cases that need
+              manual review
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div class="card">
@@ -300,6 +511,18 @@
             ></textarea>
           </div>
 
+          <div class="sample-actions">
+            <button type="button" class="sample-chip" data-sample="safe">
+              Load safe example
+            </button>
+            <button type="button" class="sample-chip" data-sample="spam">
+              Load spam example
+            </button>
+            <button type="button" class="sample-chip" data-sample="phishing">
+              Load phishing example
+            </button>
+          </div>
+
           <button type="submit" class="btn-analyze">
             <i class="fas fa-search"></i> Analyze Email
           </button>
@@ -308,7 +531,7 @@
 
       <div class="loading" id="loading">
         <div class="spinner"></div>
-        <p>Analyzing email for spam indicators...</p>
+        <p>Analyzing email for spam and phishing signals...</p>
       </div>
 
       <div class="result-card" id="resultCard">
@@ -318,7 +541,7 @@
           </div>
           <div class="result-title" id="resultTitle">Safe Email</div>
           <div class="result-subtitle" id="resultSubtitle">
-            No spam indicators detected
+            No strong spam indicators detected
           </div>
         </div>
 
@@ -358,72 +581,74 @@
     </div>
 
     <script>
-      // Ensure result card is hidden on page load and attach form handler
       document.addEventListener("DOMContentLoaded", function () {
         const resultCard = document.getElementById("resultCard");
         if (resultCard) {
           resultCard.classList.remove("show");
         }
 
-        // Attach form submit handler
+        const sampleExamples = {
+          safe: {
+            sender: "team@company.com",
+            email:
+              "Hi, the weekly meeting is still scheduled for Tuesday at 10 AM. Please review the attached agenda before the call.",
+          },
+          spam: {
+            sender: "offer@shiny-deals.xyz",
+            email:
+              "URGENT! You have been selected for a limited-time cash prize. Click the link now to claim your reward before it expires.",
+          },
+          phishing: {
+            sender: "security@bank-verify-login.com",
+            email:
+              "Your account will be suspended unless you verify your password immediately. Open the secure link below to restore access.",
+          },
+        };
+
+        document.querySelectorAll(".sample-chip").forEach((button) => {
+          button.addEventListener("click", function () {
+            const sample = sampleExamples[this.dataset.sample];
+            if (!sample) return;
+            document.getElementById("sender_email").value = sample.sender;
+            document.getElementById("email_text").value = sample.email;
+          });
+        });
+
         const form = document.getElementById("spamEmailForm");
-        if (form) {
-          console.log("Spam email form found, attaching handler...");
-          form.addEventListener("submit", async function (e) {
-            e.preventDefault();
-            console.log("Form submitted!");
+        if (!form) return;
 
-            // Show loading
-            const resultCard = document.getElementById("resultCard");
-            const loading = document.getElementById("loading");
+        form.addEventListener("submit", async function (e) {
+          e.preventDefault();
 
-            loading.classList.add("show");
-            if (resultCard) {
-              resultCard.classList.remove("show");
-            }
+          const loading = document.getElementById("loading");
+          const card = document.getElementById("resultCard");
+          loading.classList.add("show");
+          card.classList.remove("show");
 
-            // Collect form data
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
+          const formData = new FormData(e.target);
+          const payload = Object.fromEntries(formData.entries());
 
-            console.log("Form data:", {
-              subjectLength: data.subject?.length,
-              bodyLength: data.body?.length,
+          try {
+            const response = await fetch("/detect_spam", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
             });
 
-            try {
-              console.log("Sending request to /detect_spam...");
-              const response = await fetch("/detect_spam", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-              });
+            const result = await response.json();
+            loading.classList.remove("show");
 
-              console.log("Response status:", response.status);
-              const result = await response.json();
-              console.log("Response:", result);
-
-              // Hide loading
-              loading.classList.remove("show");
-
-              if (result.status === "success") {
-                displayResult(result.result);
-                resultCard.classList.add("show");
-                resultCard.style.display = "block";
-              } else {
-                alert("Error: " + (result.message || "Unknown error occurred"));
-              }
-            } catch (error) {
-              console.error("Error:", error);
-              loading.classList.remove("show");
-              alert("Error analyzing email: " + error.message);
+            if (result.status === "success") {
+              displayResult(result.result);
+              card.classList.add("show");
+            } else {
+              alert("Error: " + (result.message || "Unknown error occurred"));
             }
-          });
-        } else {
-          console.error("Spam email form not found!");
-        }
+          } catch (error) {
+            loading.classList.remove("show");
+            alert("Error analyzing email: " + error.message);
+          }
+        });
       });
 
       function displayResult(result) {
@@ -432,7 +657,7 @@
         const resultTitle = document.getElementById("resultTitle");
         const resultSubtitle = document.getElementById("resultSubtitle");
 
-        const isSpam = result.is_spam;
+        const isSpam = Boolean(result.is_spam);
         const confidenceValue = Number(
           result.confidence_percent ||
             result.confidence * 100 ||
@@ -448,7 +673,6 @@
           result.spam_probability >= 0.45 &&
           result.spam_probability <= 0.65;
 
-        // Set header based on risk level + spam status
         if (backendRisk === "HIGH" || isSpam) {
           resultHeader.className = "result-header spam";
           resultIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
@@ -480,18 +704,12 @@
             : "No strong spam indicators detected";
         }
 
-        // Set details
         document.getElementById("spamProb").textContent =
           (result.spam_probability * 100).toFixed(2) + "%";
-
-        const riskBadge = `<span class="risk-badge risk-${backendRisk.toLowerCase()}">${backendRisk}</span>`;
-        document.getElementById("riskLevel").innerHTML = riskBadge;
-
-        // Fix NaN issue - use confidence_percent if available, otherwise calculate from spam_probability
+        document.getElementById("riskLevel").innerHTML =
+          `<span class="risk-badge risk-${backendRisk.toLowerCase()}">${backendRisk}</span>`;
         document.getElementById("confidence").textContent =
           confidenceValue.toFixed(2) + "%";
-
-        // Set analysis content
         document.getElementById("spamIndicators").textContent =
           result.spam_indicators || "No specific spam indicators detected.";
         document.getElementById("recommendation").textContent =
@@ -503,4 +721,3 @@
     </script>
   </body>
 </html>
-

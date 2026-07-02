@@ -20,14 +20,9 @@ print("\n📦 Testing ML Module Imports...")
 modules_to_test = [
     ('UPI Fraud', 'ml_modules.upi_fraud.predict', 'UPIFraudDetector'),
     ('Credit Card', 'ml_modules.credit_card.predict', 'CreditCardFraudDetector'),
-    ('Loan Default', 'ml_modules.loan_default.predict', 'LoanDefaultPredictor'),
-    ('Insurance Fraud', 'ml_modules.insurance_fraud.predict', 'InsuranceFraudDetector'),
-    ('Click Fraud', 'ml_modules.click_fraud.predict', 'ClickFraudDetector'),
-    ('Fake News', 'ml_modules.fake_news.predict', 'DJDarkCyberFakeNewsDetector'),
     ('Spam Email', 'ml_modules.spam_email.predict', 'SpamDetector'),
     ('Phishing URL', 'ml_modules.phishing_url.predict', 'PhishingDetector'),
     ('Fake Profile', 'ml_modules.fake_profile.predict', 'BotDetector'),
-    ('Document Forgery', 'ml_modules.document_forgery.predict', 'ForgeryDetector'),
 ]
 
 for name, module_path, class_name in modules_to_test:

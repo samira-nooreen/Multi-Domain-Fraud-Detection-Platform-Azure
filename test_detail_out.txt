@@ -1,9 +1,0 @@
-  Phishing SVM model loaded
-google: {'is_phishing': True, 'phishing_probability': 0.95, 'risk_level': 'CRITICAL', 'recommendation': 'BLOCK - High confidence phishing URL'}
-short: {'is_phishing': True, 'phishing_probability': 0.95, 'risk_level': 'CRITICAL', 'recommendation': 'BLOCK - High confidence phishing URL'}
-legit bank: {'is_phishing': True, 'phishing_probability': 0.95, 'risk_level': 'CRITICAL', 'recommendation': 'BLOCK - High confidence phishing URL'}
-phishing long: {'is_phishing': True, 'phishing_probability': 0.95, 'risk_level': 'CRITICAL', 'recommendation': 'BLOCK - High confidence phishing URL'}
-click: {'is_phishing': False, 'phishing_probability': 0.2011, 'risk_level': 'LOW', 'recommendation': 'SAFE - URL appears legitimate'}
-  Click fraud sklearn model loaded
-click normal: {'is_fraud': True, 'fraud_probability': 0.6392, 'risk_level': 'HIGH', 'model_used': 'sklearn', 'recommendation': 'INVESTIGATE - Suspicious click pattern'}
-click bot: {'is_fraud': True, 'fraud_probability': 0.9999, 'risk_level': 'CRITICAL', 'model_used': 'sklearn', 'recommendation': 'BLOCK - Automated bot activity detected'}

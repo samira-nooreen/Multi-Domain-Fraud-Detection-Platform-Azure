@@ -90,8 +90,10 @@ git push origin main
 ## 9) Verify Live App
 
 1. Open your App Service URL.
-2. Test homepage and one fraud-detection endpoint flow.
-3. If failure occurs, check:
+2. Test homepage, login, and signup.
+3. Confirm the home page shows the heat-map dashboard rather than module cards.
+4. Confirm the auth flow still redirects to `/verify_2fa`.
+5. If failure occurs, check:
    - App Service -> Log stream
    - GitHub Actions logs
 
