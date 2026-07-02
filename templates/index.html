@@ -7,15 +7,12 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
-    <script
-      src="https://kit.fontawesome.com/a076d05399.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-            <li>Suspicious payment requests or abnormal transactions</li>
+    <link
       rel="stylesheet"
-            <li>Fraudulent messages, SMS, or phone numbers</li>
-            <li>Suspicious social media profiles</li>
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      referrerpolicy="no-referrer"
+    />
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/chatbot.css') }}"
@@ -23,8 +20,9 @@
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-                placeholder="e.g., Suspicious payment request from..."
+    />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <link
@@ -67,10 +65,8 @@
     <main>
       {% if suspicious_login %}
       <div
-                <option>Payment Risk</option>
-                <option>Phishing</option>
+        style="
           border: 1px solid #ff6f00;
-                <option>Identity Risk</option>
           padding: 15px 20px;
           margin: 20px 40px;
           border-radius: 8px;
@@ -113,29 +109,7 @@
             fraud across multiple domains. Safeguard your assets and build trust
             with our innovative solutions. Join us!
           </p>
-          <div
-            style="
-              display: inline-flex;
-              flex-wrap: wrap;
-              gap: 10px;
-              margin: 0 0 18px;
-              padding: 10px 14px;
-              border: 1px solid rgba(136, 118, 248, 0.35);
-              border-radius: 999px;
-              background: rgba(17, 17, 24, 0.75);
-              color: #d7d2ff;
-              font-size: 0.92rem;
-            "
-          >
-            <span
-              ><i class="fas fa-cloud-upload-alt"></i> Azure App Service
-              ready</span
-            >
-            <span>|</span>
-            <span>GitHub Actions deployment</span>
-            <span>|</span>
-            <span>Heat-map dashboard only</span>
-          </div>
+
           <button class="know-btn" onclick="knowMore()">Know more</button>
         </div>
 
@@ -146,6 +120,69 @@
           </video>
         </div>
       </section>
+
+      <section class="modules-section" id="modules">
+        <div class="modules-container">
+          <div class="modules-header">
+            <h2 class="modules-title">Active Detection Modules</h2>
+            <p class="modules-subtitle">
+              Quick access to the core workflows that are currently available in
+              the platform.
+            </p>
+          </div>
+
+          <div class="modules-grid">
+            <a class="module-card" href="/detect_upi">
+              <div class="module-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <h3>UPI</h3>
+              <p>Real-time UPI fraud pattern identification.</p>
+              <div class="module-action">
+                <span class="detect-btn">Detect</span>
+              </div>
+            </a>
+
+            <a class="module-card" href="/detect_credit">
+              <div class="module-icon"><i class="fas fa-credit-card"></i></div>
+              <h3>Credit</h3>
+              <p>Classify transactions accurately.</p>
+              <div class="module-action">
+                <span class="detect-btn">Detect</span>
+              </div>
+            </a>
+
+            <a class="module-card" href="/detect_spam">
+              <div class="module-icon">
+                <i class="fas fa-envelope-open-text"></i>
+              </div>
+              <h3>Spam</h3>
+              <p>Review sender and message content for spam cues.</p>
+              <div class="module-action">
+                <span class="detect-btn">Detect</span>
+              </div>
+            </a>
+
+            <a class="module-card" href="/detect_bot">
+              <div class="module-icon"><i class="fas fa-user-secret"></i></div>
+              <h3>Bot</h3>
+              <p>Inspect profile behavior and network signals.</p>
+              <div class="module-action">
+                <span class="detect-btn">Detect</span>
+              </div>
+            </a>
+
+            <a class="module-card" href="/detect_phishing">
+              <div class="module-icon"><i class="fas fa-link"></i></div>
+              <h3>Phishing</h3>
+              <p>Check links for suspicious domains and patterns.</p>
+              <div class="module-action">
+                <span class="detect-btn">Detect</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
     </main>
     <!-- About Section -->
     <section class="about-section" id="about">
@@ -153,8 +190,8 @@
         <div class="about-header">
           <h2 class="about-title">About Our Platform</h2>
           <p class="about-subtitle">
-            A real-time fraud monitoring dashboard centered on heat-map analysis
-            and incident tracking.
+            Empowering businesses with cutting-edge AI to detect and prevent
+            fraud across multiple domains
           </p>
         </div>
 
@@ -984,16 +1021,58 @@
           });
 
           // Function to scroll the Top Fraud Cities list
-          function scrollCities(direction) {
+          window.scrollCities = function (direction) {
             const container = document.getElementById("top-cities-list");
+            if (!container) return;
             const scrollAmount = 100;
             container.scrollBy({
               top: direction * scrollAmount,
               behavior: "smooth",
             });
+          };
+
+          // Legend helpers
+          function ensureLegend() {
+            const legendId = "fraud-heatmap-legend";
+            if (document.getElementById(legendId)) return;
+
+            const parent = document.querySelector(".dashboard-card.heatmap");
+            if (!parent) return;
+
+            const legend = document.createElement("div");
+            legend.id = legendId;
+            legend.style.marginTop = "10px";
+            legend.style.display = "flex";
+            legend.style.gap = "14px";
+            legend.style.flexWrap = "wrap";
+            legend.style.alignItems = "center";
+
+            const items = [
+              { level: "critical", label: "Critical" },
+              { level: "high", label: "High" },
+              { level: "medium", label: "Medium" },
+              { level: "low", label: "Low" },
+            ];
+
+            legend.innerHTML = items
+              .map((i) => {
+                const c = colors[i.level];
+                return `
+                  <div style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:#e6e6e6;">
+                    <span style="width:12px;height:12px;border-radius:50%;background:${c};border:1px solid rgba(255,255,255,0.35);display:inline-block;"></span>
+                    <span>${i.label}</span>
+                  </div>
+                `;
+              })
+              .join("");
+
+            parent.appendChild(legend);
           }
 
+          ensureLegend();
+
           // Fix for map not displaying properly
+
           setTimeout(function () {
             map.invalidateSize();
           }, 100);
