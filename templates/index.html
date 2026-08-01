@@ -46,40 +46,6 @@
           Multi-Domain Fraud Detection <br />
           <span style="font-weight: 700">Platform (MDFDP)</span>
         </div>
-      
-            .demo-access-card {
-              margin-top: 18px;
-              padding: 16px 18px;
-              border-radius: 14px;
-              border: 1px solid rgba(136, 118, 248, 0.28);
-              background: rgba(20, 20, 27, 0.7);
-              backdrop-filter: blur(6px);
-              max-width: 520px;
-            }
-      
-            .demo-access-label {
-              display: inline-block;
-              margin-bottom: 10px;
-              padding: 4px 10px;
-              border-radius: 999px;
-              background: rgba(136, 118, 248, 0.18);
-              color: #cfc7ff;
-              font-size: 0.78rem;
-              letter-spacing: 0.08em;
-              text-transform: uppercase;
-            }
-      
-            .demo-access-card p {
-              margin: 0;
-              color: #e6e6e6;
-            }
-      
-            .demo-access-meta {
-              margin-top: 8px;
-              color: #b7b3c9;
-              font-size: 0.92rem;
-              line-height: 1.5;
-            }
       </a>
 
       <ul class="navbar-links">
@@ -173,14 +139,10 @@
               class="know-btn"
               style="
                 text-decoration: none;
-                <div class="demo-access-card">
-                  <span class="demo-access-label">Demo Access</span>
-                  <p>Use the sample account to explore the full website.</p>
-                  <div class="demo-access-meta">
-                    Email: {{ demo_email or 'demo@mdfdp.local' }}<br />
-                    Password: {{ demo_password or 'Demo@12345' }}
-                  </div>
-                </div>
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+              "
               >Sign Up</a
             >
           </div>
@@ -194,10 +156,47 @@
           </button>
 
           {% if not is_authenticated %}
-          <p style="margin-top: 16px; color: #b7b3c9; font-size: 0.95rem">
-            Demo account: {{ demo_email or 'demo@mdfdp.local' }} / {{
-            demo_password or 'Demo@12345' }}
-          </p>
+          <div
+            style="
+              margin-top: 18px;
+              padding: 16px 18px;
+              border-radius: 14px;
+              border: 1px solid rgba(136, 118, 248, 0.28);
+              background: rgba(20, 20, 27, 0.7);
+              backdrop-filter: blur(6px);
+              max-width: 520px;
+            "
+          >
+            <span
+              style="
+                display: inline-block;
+                margin-bottom: 10px;
+                padding: 4px 10px;
+                border-radius: 999px;
+                background: rgba(136, 118, 248, 0.18);
+                color: #cfc7ff;
+                font-size: 0.78rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+              "
+            >
+              Demo Access
+            </span>
+            <p style="margin: 0; color: #e6e6e6">
+              Use the sample account to explore the full website.
+            </p>
+            <div
+              style="
+                margin-top: 8px;
+                color: #b7b3c9;
+                font-size: 0.92rem;
+                line-height: 1.5;
+              "
+            >
+              Email: {{ demo_email or 'demo@mdfdp.com' }}<br />
+              Password: {{ demo_password or 'MDFDP@2026' }}
+            </div>
+          </div>
           {% endif %}
         </div>
 

@@ -67,9 +67,9 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'change-this-secret-key-in-production')
 
 DEMO_ACCOUNT = {
-    'email': os.getenv('DEMO_EMAIL', 'demo@mdfdp.local'),
+    'email': os.getenv('DEMO_EMAIL', 'demo@mdfdp.com'),
     'name': os.getenv('DEMO_NAME', 'Demo User'),
-    'password': os.getenv('DEMO_PASSWORD', 'Demo@12345'),
+    'password': os.getenv('DEMO_PASSWORD', 'MDFDP@2026'),
 }
 
 # Enable CORS for all routes (allows frontend from any domain)
