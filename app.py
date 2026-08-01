@@ -66,6 +66,12 @@ def login_required(f):
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'change-this-secret-key-in-production')
 
+DEMO_ACCOUNT = {
+    'email': os.getenv('DEMO_EMAIL', 'demo@mdfdp.local'),
+    'name': os.getenv('DEMO_NAME', 'Demo User'),
+    'password': os.getenv('DEMO_PASSWORD', 'Demo@12345'),
+}
+
 # Enable CORS for all routes (allows frontend from any domain)
 CORS(app)
 
@@ -106,6 +112,39 @@ try:
     except Exception:
         # Not critical; migration is best-effort
         app.logger.info('No JSON migration performed or migration failed')
+    try:
+        demo_user = get_user_by_email(DEMO_ACCOUNT['email'])
+        demo_password_hash = generate_password_hash(DEMO_ACCOUNT['password'])
+        if demo_user:
+            conn = get_db_connection()
+            try:
+                cursor = conn.cursor()
+                cursor.execute(
+                    'UPDATE users SET name = ?, password_hash = ?, totp_secret = NULL WHERE email = ?',
+                    (DEMO_ACCOUNT['name'], demo_password_hash, DEMO_ACCOUNT['email'])
+                )
+                conn.commit()
+            finally:
+                conn.close()
+        else:
+            user_id = create_user(
+                DEMO_ACCOUNT['email'],
+                DEMO_ACCOUNT['name'],
+                DEMO_ACCOUNT['password']
+            )
+            if user_id:
+                conn = get_db_connection()
+                try:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        'UPDATE users SET totp_secret = NULL WHERE id = ?',
+                        (user_id,)
+                    )
+                    conn.commit()
+                finally:
+                    conn.close()
+    except Exception as _demo_ex:
+        app.logger.info('Demo account setup skipped: %s', str(_demo_ex))
 except Exception as e:
     # Log and continue; app should still start so health checks can report
     # accurate errors instead of the process dying during import.
@@ -247,17 +286,38 @@ def login():
     if 'user_id' in session:
         return redirect(url_for('index'))
 
-    if request.method == 'GET':
+    if request.method in ('GET', 'HEAD'):
         # Get the redirect URL if provided
         next_url = request.args.get('next')
-        return render_template('login.html', next_url=next_url)
+        return render_template(
+            'login.html',
+            next_url=next_url,
+            demo_email=DEMO_ACCOUNT['email'],
+            demo_password=DEMO_ACCOUNT['password']
+        )
     
     email = (request.form.get('email') or '').strip().lower()
     password = request.form.get('password')
     
     # Verify user credentials using database
     if not verify_user_password(email, password):
-        return render_template('login.html', error='Invalid email or password')
+        return render_template(
+            'login.html',
+            error='Invalid email or password',
+            demo_email=DEMO_ACCOUNT['email'],
+            demo_password=DEMO_ACCOUNT['password']
+        )
+
+    if email == DEMO_ACCOUNT['email']:
+        user = get_user_by_email(email)
+        session.clear()
+        session['user_id'] = user['id']
+        session['user_name'] = user['name']
+
+        next_url = request.form.get('next')
+        if next_url and next_url.startswith('/'):
+            return redirect(next_url)
+        return redirect(url_for('index'))
     
     # Get user from database
     user = get_user_by_email(email)
@@ -309,7 +369,7 @@ def signup():
     if 'user_id' in session:
         return redirect(url_for('index'))
 
-    if request.method == 'GET':
+    if request.method in ('GET', 'HEAD'):
         reset_requested = request.args.get('reset') == '1'
         return render_template(
             'signup.html',
@@ -370,7 +430,7 @@ def verify_2fa():
     if not user:
         return redirect(url_for('login'))
     
-    if request.method == 'GET':
+    if request.method in ('GET', 'HEAD'):
         setup_mode = session.get('setup_2fa', False)
         
         # Get TOTP secret from database
@@ -514,20 +574,26 @@ def health():
 
 # ==================== HOME ROUTE ====================
 @app.route('/')
-@login_required
 def index():
     """Render the main dashboard page"""
     suspicious_login = session.pop('suspicious_login', False)
     # Pass user's full name to template for personalized welcome message
     user_name = session.get('user_name', 'User')
-    return render_template('index.html', suspicious_login=suspicious_login, user_name=user_name)
+    return render_template(
+        'index.html',
+        suspicious_login=suspicious_login,
+        user_name=user_name,
+        is_authenticated='user_id' in session,
+        demo_email=DEMO_ACCOUNT['email'],
+        demo_password=DEMO_ACCOUNT['password']
+    )
 
 # ==================== UPI FRAUD DETECTION ====================
 @app.route('/detect_upi', methods=['GET', 'POST'])
 @login_required
 def detect_upi():
     """UPI fraud detection with XGBoost"""
-    if request.method == 'GET':
+    if request.method in ('GET', 'HEAD'):
         return render_template('upi_fraud.html')
     
     try:
@@ -582,7 +648,7 @@ def detect_upi():
 @login_required
 def detect_credit():
     """Credit Card fraud detection with minimal inputs"""
-    if request.method == 'GET':
+    if request.method in ('GET', 'HEAD'):
         return render_template('credit_card.html')
     
     try:
@@ -903,7 +969,7 @@ def perform_ai_analysis(report_data):
 @app.route('/detect_spam', methods=['GET', 'POST'])
 @login_required
 def detect_spam():
-    if request.method == 'GET':
+    if request.method in ('GET', 'HEAD'):
         return render_template('spam_email.html')
     
     try:
@@ -967,7 +1033,7 @@ def detect_spam():
 @app.route('/detect_phishing', methods=['GET', 'POST'])
 @login_required
 def detect_phishing():
-    if request.method == 'GET':
+    if request.method in ('GET', 'HEAD'):
         return render_template('phishing_url.html')
     
     try:
@@ -1037,7 +1103,7 @@ def detect_phishing():
 @login_required
 def detect_bot():
     """Fake Profile/Bot detection with minimal inputs"""
-    if request.method == 'GET':
+    if request.method in ('GET', 'HEAD'):
         return render_template('fake_profile.html')
     
     try:

@@ -46,6 +46,40 @@
           Multi-Domain Fraud Detection <br />
           <span style="font-weight: 700">Platform (MDFDP)</span>
         </div>
+      
+            .demo-access-card {
+              margin-top: 18px;
+              padding: 16px 18px;
+              border-radius: 14px;
+              border: 1px solid rgba(136, 118, 248, 0.28);
+              background: rgba(20, 20, 27, 0.7);
+              backdrop-filter: blur(6px);
+              max-width: 520px;
+            }
+      
+            .demo-access-label {
+              display: inline-block;
+              margin-bottom: 10px;
+              padding: 4px 10px;
+              border-radius: 999px;
+              background: rgba(136, 118, 248, 0.18);
+              color: #cfc7ff;
+              font-size: 0.78rem;
+              letter-spacing: 0.08em;
+              text-transform: uppercase;
+            }
+      
+            .demo-access-card p {
+              margin: 0;
+              color: #e6e6e6;
+            }
+      
+            .demo-access-meta {
+              margin-top: 8px;
+              color: #b7b3c9;
+              font-size: 0.92rem;
+              line-height: 1.5;
+            }
       </a>
 
       <ul class="navbar-links">
@@ -54,12 +88,22 @@
         <li><a href="/security">Security</a></li>
         <li><a href="/#report-fraud">Report</a></li>
         <li><a href="/#contact">Contact</a></li>
+        {% if is_authenticated %}
         <li><a href="/logout" class="btn-danger">Logout</a></li>
+        {% else %}
+        <li><a href="/login" class="btn-danger">Login</a></li>
+        {% endif %}
       </ul>
 
+      {% if is_authenticated %}
       <a href="/profile" class="navbar-btn"
         ><i class="fas fa-user"></i> Profile</a
       >
+      {% else %}
+      <a href="/signup" class="navbar-btn"
+        ><i class="fas fa-user-plus"></i> Sign Up</a
+      >
+      {% endif %}
     </nav>
 
     <main>
@@ -110,7 +154,51 @@
             with our innovative solutions. Join us!
           </p>
 
-          <button class="know-btn" onclick="knowMore()">Know more</button>
+          <div
+            style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px"
+          >
+            <a
+              href="/login"
+              class="know-btn"
+              style="
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+              "
+              >Login</a
+            >
+            <a
+              href="/signup"
+              class="know-btn"
+              style="
+                text-decoration: none;
+                <div class="demo-access-card">
+                  <span class="demo-access-label">Demo Access</span>
+                  <p>Use the sample account to explore the full website.</p>
+                  <div class="demo-access-meta">
+                    Email: {{ demo_email or 'demo@mdfdp.local' }}<br />
+                    Password: {{ demo_password or 'Demo@12345' }}
+                  </div>
+                </div>
+              >Sign Up</a
+            >
+          </div>
+
+          <button
+            class="know-btn"
+            onclick="knowMore()"
+            style="margin-top: 14px"
+          >
+            Know more
+          </button>
+
+          {% if not is_authenticated %}
+          <p style="margin-top: 16px; color: #b7b3c9; font-size: 0.95rem">
+            Demo account: {{ demo_email or 'demo@mdfdp.local' }} / {{
+            demo_password or 'Demo@12345' }}
+          </p>
+          {% endif %}
         </div>
 
         <div class="hero-right">
