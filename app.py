@@ -78,6 +78,16 @@ CORS(app)
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=os.getenv('SOCKETIO_ASYNC_MODE', 'threading'))
 
+
+@app.after_request
+def add_no_cache_headers(response):
+    """Avoid stale local HTML while the UI is being updated during development."""
+    if response.content_type and response.content_type.startswith('text/html'):
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
+
 # Optional: Application Insights / OpenTelemetry instrumentation (enabled when
 # `APPLICATIONINSIGHTS_CONNECTION_STRING` or `AZURE_MONITOR_CONNECTION_STRING`
 # env var is set and required packages are installed).
@@ -1033,119 +1043,31 @@ def detect_spam():
 @app.route('/detect_phishing', methods=['GET', 'POST'])
 @login_required
 def detect_phishing():
+    # Mark this module as coming soon. For GET render a simple page, for POST return JSON.
     if request.method in ('GET', 'HEAD'):
-        return render_template('phishing_url.html')
-    
-    try:
-        data = request.json
+        return render_template('coming_soon.html', module_name='Phishing URL Detection')
 
-        # Force reload module to avoid stale phishing rules in long-running sessions
-        import sys
-        module_name = 'ml_modules.phishing_url.predict'
-        if module_name in sys.modules:
-            del sys.modules[module_name]
-
-        detector = get_detector(
-            'ml_modules.phishing_url.predict',
-            'PhishingDetector',
-            init_kwargs={'model_path': 'ml_modules/phishing_url/phishing_model.pkl'}
-        )
-        url_value = data.get('url', '')
-        result = detector.predict(url_value)
-
-        # Route-level safety calibration to prevent false positives on known official domains
-        from urllib.parse import urlparse
-
-        trusted_domains = {
-            'amazon.in', 'www.amazon.in', 'amazon.com', 'www.amazon.com',
-            'google.com', 'www.google.com', 'accounts.google.com',
-            'paypal.com', 'www.paypal.com',
-            'microsoft.com', 'www.microsoft.com',
-            'apple.com', 'www.apple.com'
-        }
-
-        try:
-            parsed = urlparse(url_value if '://' in url_value else ('https://' + url_value))
-            host = (parsed.netloc or parsed.path).lower().split('@')[-1].split(':')[0].rstrip('.')
-        except Exception:
-            host = ''
-
-        if host in trusted_domains:
-            result.update({
-                'is_phishing': False,
-                'phishing_probability': 0.05,
-                'risk_level': 'LOW',
-                'confidence': 0.90,
-                'confidence_percent': 90.0,
-                'url_features': f'Official trusted domain verified: {host}',
-                'recommendation': 'SAFE - URL appears legitimate'
-            })
-        
-        # Log to database if user is logged in
-        if 'user_id' in session:
-            user = get_user_by_id(session['user_id'])
-            if user:
-                log_fraud_analysis(
-                    user_id=user['id'],
-                    module_name='Phishing URL',
-                    input_data={'url': url_value},
-                    result_data=result,
-                    fraud_probability=result.get('phishing_probability', 0),
-                    risk_level=result.get('risk_level', 'UNKNOWN')
-                )
-        
-        return jsonify({'status': 'success', 'module': 'Phishing URL', 'result': result})
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+    # POST - API use
+    return jsonify({
+        'status': 'coming_soon',
+        'module': 'Phishing URL Detection',
+        'message': 'This module is coming soon and is not yet available.'
+    }), 503
 
 # ==================== FAKE PROFILE/BOT DETECTION ====================
 @app.route('/detect_bot', methods=['GET', 'POST'])
 @login_required
 def detect_bot():
     """Fake Profile/Bot detection with minimal inputs"""
+    # Mark this module as coming soon. For GET render a simple page, for POST return JSON.
     if request.method in ('GET', 'HEAD'):
-        return render_template('fake_profile.html')
-    
-    try:
-        data = request.json
-        # Lazy-load bot detector
-        detector = get_detector(
-            'ml_modules.fake_profile.predict',
-            'BotDetector',
-            init_kwargs={'model_dir': 'ml_modules/fake_profile'}
-        )
-        
-        # Prepare data with minimal inputs
-        profile_data = {
-            'username': data.get('username', ''),
-            'account_creation_date': data.get('account_creation_date', ''),
-            'follower_count': int(data.get('follower_count', 0)),
-            'posts_count': int(data.get('posts_count', 0))
-        }
-        
-        # Predict
-        result = detector.predict(profile_data)
-        
-        # Log to database if user is logged in
-        if 'user_id' in session:
-            user = get_user_by_id(session['user_id'])
-            if user:
-                log_fraud_analysis(
-                    user_id=user['id'],
-                    module_name='Fake Profile / Bot Detection',
-                    input_data=profile_data,
-                    result_data=result,
-                    fraud_probability=result.get('bot_probability', 0),
-                    risk_level=result.get('risk_level', 'UNKNOWN')
-                )
-        
-        return jsonify({
-            'status': 'success', 
-            'module': 'Fake Profile / Bot Detection', 
-            'result': result
-        })
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        return render_template('coming_soon.html', module_name='Fake Profile / Bot Detection')
+
+    return jsonify({
+        'status': 'coming_soon',
+        'module': 'Fake Profile / Bot Detection',
+        'message': 'This module is coming soon and is not yet available.'
+    }), 503
 
 # ==================== GENERIC DETECT ENDPOINT ====================
 @app.route('/detect', methods=['POST'])
@@ -1193,7 +1115,7 @@ def profile():
     activity = {
         'reports_submitted': random.randint(12, 45),
         'predictions_made': random.randint(150, 500),
-        'frequent_modules': ['UPI Fraud', 'Credit Card', 'Phishing URL'],
+        'frequent_modules': ['UPI Fraud', 'Credit Card', 'Spam Email'],
         'last_module': 'Credit Card Fraud',
         'recent_logs': [
             {'action': 'Login', 'time': '2 hrs ago', 'details': 'Successful login from new device'},
@@ -1261,8 +1183,8 @@ def api_status():
             'upi_fraud': 'active',
             'credit_card': 'active',
             'spam_email': 'active',
-            'phishing_url': 'active',
-            'fake_profile': 'active',
+            'phishing_url': 'coming_soon',
+            'fake_profile': 'coming_soon',
         }
     })
 

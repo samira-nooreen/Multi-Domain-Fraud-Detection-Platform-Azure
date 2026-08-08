@@ -445,8 +445,8 @@ async function fetchAnomalyData() {
         anomalyData = [
             { id: 1, type: "UPI Fraud Detection", location: "Mumbai", severity: "critical", time: "2 sec ago", description: "Multiple high-value transactions from same device", cases: 28 },
             { id: 2, type: "Credit Card Fraud Detection", location: "Delhi", severity: "high", time: "15 sec ago", description: "Unusual spending pattern detected", cases: 41 },
-            { id: 3, type: "Phishing URL Detection", location: "Bangalore", severity: "medium", time: "32 sec ago", description: "Malicious URL flagged", cases: 59 },
-            { id: 4, type: "Fake Profile Detection", location: "Chennai", severity: "medium", time: "48 sec ago", description: "Suspicious bot activity detected", cases: 54 },
+            { id: 3, type: "Phishing Campaign Trend", location: "Bangalore", severity: "medium", time: "32 sec ago", description: "Suspicious URL reports trending", cases: 59 },
+            { id: 4, type: "Profile Integrity Monitoring", location: "Chennai", severity: "medium", time: "48 sec ago", description: "Coming-soon signal category tracked from reports", cases: 54 },
             { id: 5, type: "Spam Email Detection", location: "Jaipur", severity: "high", time: "7 min ago", description: "Bulk spam campaign identified", cases: 38 }
         ];
         
