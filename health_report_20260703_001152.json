@@ -1,0 +1,44 @@
+{
+  "api_status": {
+    "success": true,
+    "status_code": 200,
+    "response": {
+      "logged_in": false,
+      "modules": {
+        "credit_card": "active",
+        "fake_profile": "active",
+        "phishing_url": "active",
+        "spam_email": "active",
+        "upi_fraud": "active"
+      },
+      "status": "online",
+      "version": "1.0.0"
+    },
+    "timestamp": "2026-07-03T00:11:51.937907"
+  },
+  "module_availability": {
+    "success": true,
+    "available_modules": [
+      "fake_profile",
+      "credit_card",
+      "spam_email",
+      "phishing_url",
+      "upi_fraud"
+    ],
+    "expected_modules": [
+      "phishing_url",
+      "fake_profile",
+      "spam_email",
+      "upi_fraud",
+      "credit_card"
+    ],
+    "missing_modules": [],
+    "timestamp": "2026-07-03T00:11:51.966949"
+  },
+  "routes_existence": {
+    "success": false,
+    "accessible_routes": 2,
+    "total_routes": 13,
+    "timestamp": "2026-07-03T00:11:52.043439"
+  }
+}

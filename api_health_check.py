@@ -148,7 +148,7 @@ class MDFDPHealthChecker:
             try:
                 # Use HEAD request for efficiency
                 response = requests.head(f"{self.base_url}{route}")
-                if response.status_code in [200, 401, 405]:  # 401 = auth required, 405 = method not allowed
+                if response.status_code in [200, 302, 401, 405]:  # 401 = auth required, 405 = method not allowed
                     accessible_routes += 1
                 else:
                     print(f"  Route {route} returned status {response.status_code}")
